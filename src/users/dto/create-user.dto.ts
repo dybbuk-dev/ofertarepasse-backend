@@ -16,6 +16,7 @@ export class CreateUserDto {
   @IsOptional()
   status: UserEntity['status'];
 
+  @ApiProperty()
   @IsNotEmpty()
   type: UserEntity['type'];
 
