@@ -1,69 +1,68 @@
+import { AdvertEntity } from './../entities/advert.entity';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateAdvertDto {
   @IsNotEmpty()
-  plate: string;
+  plate: AdvertEntity['plate'];
 
   @IsNotEmpty()
   @IsOptional()
-  images: string[];
+  images: AdvertEntity['images'];
 
   @IsNotEmpty()
-  brand: string;
+  brand: AdvertEntity['brand'];
 
   @IsNotEmpty()
-  model: string;
+  model: AdvertEntity['model'];
 
   @IsNotEmpty()
-  modelYear: string;
+  fuel: AdvertEntity['fuel'];
 
   @IsNotEmpty()
-  manufactureYear: string;
+  modelYear: AdvertEntity['modelYear'];
 
   @IsNotEmpty()
-  version: string;
+  manufactureYear: AdvertEntity['manufactureYear'];
 
   @IsNotEmpty()
-  color: string;
+  version: AdvertEntity['version'];
 
   @IsNotEmpty()
-  amountDoors: string;
+  color: AdvertEntity['color'];
 
   @IsNotEmpty()
-  exchange: string;
+  kilometer: AdvertEntity['kilometer'];
 
   @IsNotEmpty()
-  @IsOptional()
-  armored: boolean;
-
-  @IsNotEmpty()
-  kilometer: number;
+  value: AdvertEntity['value'];
 
   @IsNotEmpty()
   @IsOptional()
-  differential: string;
+  about: AdvertEntity['about'];
 
   @IsNotEmpty()
-  value: number;
-
-  @IsNotEmpty()
-  @IsOptional()
-  details: string;
-
-  @IsNotEmpty()
-  userId: string;
+  userId: AdvertEntity['userId'];
 
   @IsNotEmpty()
   @IsOptional()
-  views: number;
+  views: AdvertEntity['views'];
 
   @IsNotEmpty()
   @IsOptional()
-  active: boolean;
+  active: AdvertEntity['active'];
 
   @IsNotEmpty()
-  city: string;
+  city: AdvertEntity['city'];
 
   @IsNotEmpty()
-  state: string;
+  state: AdvertEntity['state'];
+
+  @IsOptional()
+  highlight: AdvertEntity['highlight'];
+
+  @IsOptional()
+  amountPeaple: number;
+
+  @IsOptional()
+  rolling: number;
 }

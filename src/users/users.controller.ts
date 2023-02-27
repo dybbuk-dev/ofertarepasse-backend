@@ -21,32 +21,32 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async create(@Body() body: CreateUserDto) {
+  create(@Body() body: CreateUserDto) {
     return this.usersService.create(body);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
-  async findAll() {
+  findAll() {
     return this.usersService.findAll();
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe()) id: string) {
+  findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.findOne({ where: { id } });
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() body: UpdateUserDto) {
+  update(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.usersService.update(id, body);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string) {
+  remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
 }

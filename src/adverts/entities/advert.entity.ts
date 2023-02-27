@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'adverts' })
-export class Advert {
+export class AdvertEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -24,6 +24,15 @@ export class Advert {
   @Column()
   model: string;
 
+  @Column()
+  fuel: string;
+
+  @Column({ nullable: true, default: null })
+  amountPeaple: number;
+
+  @Column({ nullable: true, default: null })
+  rolling: number;
+
   @Column({ name: 'model_year' })
   modelYear: string;
 
@@ -36,26 +45,14 @@ export class Advert {
   @Column()
   color: string;
 
-  @Column({ name: 'amount_doors' })
-  amountDoors: string;
-
-  @Column()
-  exchange: string;
-
-  @Column({ default: false })
-  armored: boolean;
-
   @Column({ default: 0 })
   kilometer: number;
-
-  @Column({ nullable: true, default: null })
-  differential: string;
 
   @Column()
   value: number;
 
   @Column({ nullable: true, default: null })
-  details: string;
+  about: string;
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
@@ -72,4 +69,7 @@ export class Advert {
 
   @Column()
   state: string;
+
+  @Column('simple-array', { nullable: true, default: null })
+  highlight: string[];
 }

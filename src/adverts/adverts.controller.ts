@@ -10,8 +10,9 @@ import {
 import { AdvertsService } from './adverts.service';
 import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
+import { AdvertEntity } from './entities/advert.entity';
 
-@Controller('adverts')
+@Controller('/api/v1/adverts')
 export class AdvertsController {
   constructor(private readonly advertsService: AdvertsService) {}
 
@@ -26,17 +27,20 @@ export class AdvertsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.advertsService.findOne(+id);
+  findOne(@Param('id') id: AdvertEntity['id']) {
+    return this.advertsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdvertDto: UpdateAdvertDto) {
-    return this.advertsService.update(+id, updateAdvertDto);
+  update(
+    @Param('id') id: AdvertEntity['id'],
+    @Body() updateAdvertDto: UpdateAdvertDto,
+  ) {
+    return this.advertsService.update(id, updateAdvertDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.advertsService.remove(+id);
+  remove(@Param('id') id: AdvertEntity['id']) {
+    return this.advertsService.remove(id);
   }
 }
