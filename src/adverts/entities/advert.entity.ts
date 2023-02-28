@@ -13,6 +13,9 @@ export class AdvertEntity {
   id: string;
 
   @Column()
+  title: string;
+
+  @Column()
   plate: string;
 
   @Column('simple-array', { nullable: true, default: null })

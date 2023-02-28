@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HttpException } from '@nestjs/common/exceptions/http.exception';
 
 @Injectable()
 export class AdvertsService {
@@ -28,11 +29,22 @@ export class AdvertsService {
     return this.advertsRepository.findOne({ where: { id } });
   }
 
-  update(id: AdvertEntity['id'], updateAdvertDto: UpdateAdvertDto) {
-    return `This action updates a #${id} advert`;
+  async update(id: AdvertEntity['id'], data: UpdateAdvertDto) {
+    const advert = await this.findOne(id);
+
+    if (advert) {
+      this.advertsRepository.merge(advert, data);
+      return await this.advertsRepository.save(advert);
+    }
   }
 
-  remove(id: AdvertEntity['id']) {
-    return `This action removes a #${id} advert`;
+  async remove(id: AdvertEntity['id']) {
+    const advert = await this.findOne(id);
+
+    if (advert) {
+      return this.advertsRepository.delete(id);
+    } else {
+      return new HttpException('Advert not found', 404);
+    }
   }
 }

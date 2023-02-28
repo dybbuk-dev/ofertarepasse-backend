@@ -6,6 +6,8 @@ export class CreateAdvertDto {
   plate: AdvertEntity['plate'];
 
   @IsNotEmpty()
+  title: AdvertEntity['title'];
+
   @IsOptional()
   images: AdvertEntity['images'];
 
@@ -36,16 +38,11 @@ export class CreateAdvertDto {
   @IsNotEmpty()
   value: AdvertEntity['value'];
 
-  @IsNotEmpty()
   @IsOptional()
   about: AdvertEntity['about'];
 
   @IsNotEmpty()
   userId: AdvertEntity['userId'];
-
-  @IsNotEmpty()
-  @IsOptional()
-  views: AdvertEntity['views'];
 
   @IsNotEmpty()
   @IsOptional()
@@ -61,8 +58,8 @@ export class CreateAdvertDto {
   highlight: AdvertEntity['highlight'];
 
   @IsOptional()
-  amountPeaple: number;
+  amountPeaple: AdvertEntity['amountPeaple'];
 
   @IsOptional()
-  rolling: number;
+  rolling: AdvertEntity['rolling'];
 }
