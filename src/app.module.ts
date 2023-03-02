@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdvertsModule } from './adverts/adverts.module';
+import { ViewsModule } from './views/views.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AdvertsModule } from './adverts/adverts.module';
     UsersModule,
     AuthModule,
     AdvertsModule,
+    ViewsModule,
   ],
   controllers: [],
   providers: [],

@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { AdvertsService } from './adverts.service';
 import { CreateAdvertDto } from './dto/create-advert.dto';
@@ -22,8 +23,8 @@ export class AdvertsController {
   }
 
   @Get()
-  findAll() {
-    return this.advertsService.findAll();
+  findAll(@Query('page') page = 1, @Query('limit') limit = 20) {
+    return this.advertsService.findAll({ page, limit });
   }
 
   @Get(':id')

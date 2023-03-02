@@ -5,6 +5,11 @@ import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import {
+  IPaginationOptions,
+  Pagination,
+  paginate,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class AdvertsService {
@@ -21,8 +26,12 @@ export class AdvertsService {
     return advert;
   }
 
-  findAll() {
-    return this.advertsRepository.find();
+  async findAll(
+    options: IPaginationOptions,
+  ): Promise<Pagination<AdvertEntity>> {
+    const queryBuilder = this.advertsRepository.createQueryBuilder();
+
+    return paginate(queryBuilder, options);
   }
 
   findOne(id: AdvertEntity['id']) {
