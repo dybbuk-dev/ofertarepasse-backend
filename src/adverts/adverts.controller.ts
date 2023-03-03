@@ -32,6 +32,11 @@ export class AdvertsController {
     return this.advertsService.findOne(id);
   }
 
+  @Post('/views')
+  views(@Query() query: { id?: string; advert?: string }) {
+    return this.advertsService.views(query);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: AdvertEntity['id'],

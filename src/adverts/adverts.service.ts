@@ -38,6 +38,34 @@ export class AdvertsService {
     return this.advertsRepository.findOne({ where: { id } });
   }
 
+  async views(query: { id?: string; advert?: string }) {
+    try {
+      const adverts = await this.advertsRepository
+        .createQueryBuilder()
+        .where(
+          query.id
+            ? `user_id = "${query.id}"`
+            : query.advert
+            ? `id = "${query.advert}"`
+            : '',
+        )
+        .select(`${!query.advert ? 'SUM(views)' : 'views'}`, 'count')
+        .getRawOne();
+
+      return {
+        error: false,
+        count: Number(adverts.count),
+      };
+    } catch (err) {
+      console.log(err);
+
+      return {
+        error: true,
+        message: 'Failed get view',
+      };
+    }
+  }
+
   async update(id: AdvertEntity['id'], data: UpdateAdvertDto) {
     const advert = await this.findOne(id);
 

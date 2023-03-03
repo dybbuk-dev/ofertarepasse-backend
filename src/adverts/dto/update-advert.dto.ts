@@ -25,5 +25,9 @@ export class UpdateAdvertDto {
 
   @ApiProperty()
   @IsOptional()
+  alert: AdvertEntity['alert'];
+
+  @ApiProperty()
+  @IsOptional()
   highlight: AdvertEntity['highlight'];
 }

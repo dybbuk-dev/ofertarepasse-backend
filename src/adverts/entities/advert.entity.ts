@@ -1,10 +1,12 @@
 import { UserEntity } from './../../users/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'adverts' })
@@ -57,13 +59,15 @@ export class AdvertEntity {
   @Column({ nullable: true, default: null })
   about: string;
 
+  @Column({ nullable: true, default: null })
+  alert: string;
+
   @ManyToOne(() => UserEntity, (user) => user.id)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   userId: string;
 
   @Column({ default: 0 })
   views: number;
-
   @Column({ default: true })
   active: boolean;
 
@@ -75,4 +79,13 @@ export class AdvertEntity {
 
   @Column('simple-array', { nullable: true, default: null })
   highlight: string[];
+
+  @Column({ name: 'fipe_value' })
+  fipeValue: number;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

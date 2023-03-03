@@ -38,8 +38,14 @@ export class CreateAdvertDto {
   @IsNotEmpty()
   value: AdvertEntity['value'];
 
+  @IsNotEmpty()
+  fipeValue: AdvertEntity['fipeValue'];
+
   @IsOptional()
   about: AdvertEntity['about'];
+
+  @IsOptional()
+  alert: AdvertEntity['alert'];
 
   @IsNotEmpty()
   userId: AdvertEntity['userId'];
