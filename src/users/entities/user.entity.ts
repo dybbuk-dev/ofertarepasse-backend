@@ -19,6 +19,9 @@ export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: true, default: null })
+  image: string;
+
   @Column()
   name: string;
 

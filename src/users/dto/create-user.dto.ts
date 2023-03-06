@@ -8,6 +8,10 @@ export class CreateUserDto {
   name: UserEntity['name'];
 
   @ApiProperty()
+  @IsOptional()
+  image: UserEntity['image'];
+
+  @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
   email: UserEntity['email'];
