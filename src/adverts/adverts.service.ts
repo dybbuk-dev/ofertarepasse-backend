@@ -78,10 +78,20 @@ export class AdvertsService {
         });
       }
     }
+
     if (!!options.query.maxYear) {
-      queryBuilder.andWhere('model_year <= :max', {
-        max: options.query.maxYear,
-      });
+      if (
+        !!options.query.minYear &&
+        Number(options.query.maxPrice) > Number(options.query.minYear)
+      ) {
+        queryBuilder
+          .andWhere('model_year <= :max', { max: options.query.maxYear })
+          .andWhere('model_year >= :min', { min: options.query.minYear });
+      } else {
+        queryBuilder.andWhere('model_year <= :max', {
+          max: options.query.maxYear,
+        });
+      }
     }
 
     if (!!options.query.minPrice) {
@@ -93,7 +103,9 @@ export class AdvertsService {
           .andWhere('value <= :max', { max: options.query.maxPrice })
           .andWhere('value >= :min', { min: options.query.minPrice });
       } else {
-        queryBuilder.andWhere('value >= :min', { min: options.query.minPrice });
+        queryBuilder.andWhere('value >= :min', {
+          min: options.query.minPrice,
+        });
       }
     }
 
