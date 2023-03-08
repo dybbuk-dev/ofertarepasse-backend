@@ -11,6 +11,23 @@ import {
   paginate,
 } from 'nestjs-typeorm-paginate';
 
+interface IOptionsFindAll extends IPaginationOptions {
+  query: {
+    title: string;
+    brand: string;
+    city: string;
+    minYear: string;
+    maxYear: string;
+    minPrice: string;
+    maxPrice: string;
+    minKilometer: string;
+    maxKilometer: string;
+    exchange: string;
+    armored: string;
+    bodywork: string;
+  };
+}
+
 @Injectable()
 export class AdvertsService {
   constructor(
@@ -26,10 +43,116 @@ export class AdvertsService {
     return advert;
   }
 
-  async findAll(
-    options: IPaginationOptions,
-  ): Promise<Pagination<AdvertEntity>> {
+  async findAll(options: IOptionsFindAll): Promise<Pagination<AdvertEntity>> {
     const queryBuilder = this.advertsRepository.createQueryBuilder();
+
+    if (!!options.query.title) {
+      queryBuilder.andWhere(`title like :title`, {
+        title: `%${options.query.title}%`,
+      });
+    }
+
+    if (!!options.query.brand) {
+      queryBuilder.andWhere(`brand like :brand`, {
+        brand: `%${options.query.brand}%`,
+      });
+    }
+
+    if (!!options.query.city) {
+      queryBuilder.andWhere(`city like :city`, {
+        city: `%${options.query.city}%`,
+      });
+    }
+
+    if (!!options.query.minYear) {
+      if (
+        !!options.query.maxYear &&
+        Number(options.query.maxYear) > Number(options.query.minYear)
+      ) {
+        queryBuilder
+          .andWhere('model_year <= :max', { max: options.query.maxYear })
+          .andWhere('model_year >= :min', { min: options.query.minYear });
+      } else {
+        queryBuilder.andWhere('model_year >= :min', {
+          min: options.query.minYear,
+        });
+      }
+    }
+
+    if (!!options.query.maxYear) {
+      if (
+        !!options.query.minYear &&
+        Number(options.query.maxPrice) > Number(options.query.minYear)
+      ) {
+        queryBuilder
+          .andWhere('model_year <= :max', { max: options.query.maxYear })
+          .andWhere('model_year >= :min', { min: options.query.minYear });
+      } else {
+        queryBuilder.andWhere('model_year <= :max', {
+          max: options.query.maxYear,
+        });
+      }
+    }
+
+    if (!!options.query.minPrice) {
+      if (
+        !!options.query.maxPrice &&
+        Number(options.query.maxPrice) > Number(options.query.minPrice)
+      ) {
+        queryBuilder
+          .andWhere('value <= :max', { max: options.query.maxPrice })
+          .andWhere('value >= :min', { min: options.query.minPrice });
+      } else {
+        queryBuilder.andWhere('value >= :min', {
+          min: options.query.minPrice,
+        });
+      }
+    }
+
+    if (!!options.query.maxPrice) {
+      if (
+        !!options.query.minPrice &&
+        Number(options.query.maxPrice) > Number(options.query.minPrice)
+      ) {
+        queryBuilder
+          .andWhere('value <= :max', { max: options.query.maxPrice })
+          .andWhere('value >= :min', { min: options.query.minPrice });
+      } else {
+        queryBuilder.andWhere('value <= :max', { max: options.query.maxPrice });
+      }
+    }
+
+    if (!!options.query.minKilometer) {
+      if (
+        !!options.query.maxKilometer &&
+        Number(options.query.maxKilometer) > Number(options.query.minKilometer)
+      ) {
+        queryBuilder
+          .andWhere('kilometer <= :max', { max: options.query.maxKilometer })
+          .andWhere('kilometer >= :min', { min: options.query.minKilometer });
+      } else {
+        queryBuilder.andWhere('kilometer >= :min', {
+          min: options.query.minKilometer,
+        });
+      }
+    }
+
+    if (!!options.query.maxKilometer) {
+      if (
+        !!options.query.minKilometer &&
+        Number(options.query.maxKilometer) > Number(options.query.minKilometer)
+      ) {
+        queryBuilder
+          .andWhere('kilometer <= :max', { max: options.query.maxKilometer })
+          .andWhere('kilometer >= :min', { min: options.query.minKilometer });
+      } else {
+        queryBuilder.andWhere('kilometer <= :max', {
+          max: options.query.maxKilometer,
+        });
+      }
+    }
+
+    queryBuilder.getMany();
 
     return paginate(queryBuilder, options);
   }
