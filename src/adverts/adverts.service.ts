@@ -1,5 +1,5 @@
 import { AdvertEntity } from './entities/advert.entity';
-import { Repository } from 'typeorm';
+import { Like, Between, Repository, Not, } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
@@ -33,7 +33,7 @@ export class AdvertsService {
   constructor(
     @InjectRepository(AdvertEntity)
     private readonly advertsRepository: Repository<AdvertEntity>,
-  ) {}
+  ) { }
 
   async create(data: CreateAdvertDto) {
     const advert = this.advertsRepository.create(data);
@@ -43,118 +43,31 @@ export class AdvertsService {
     return advert;
   }
 
-  async findAll(options: IOptionsFindAll): Promise<Pagination<AdvertEntity>> {
-    const queryBuilder = this.advertsRepository.createQueryBuilder();
+  async findAll(options: IOptionsFindAll): Promise<any> {
+    const queries = options.query;
 
-    if (!!options.query.title) {
-      queryBuilder.andWhere(`title like :title`, {
-        title: `%${options.query.title}%`,
-      });
+    const whereOptions = {
+      title: queries.title ? Like(`%${queries.title}%`) : Not(''),
+      value:
+        queries.minPrice || queries.maxPrice
+          ? Between((queries.minPrice ? queries.minPrice : 0), (queries.maxPrice ? queries.maxPrice : 100000)) : Not(''),
+      brand: queries.brand ? Like(`%${queries.brand}%`) : Not(''),
+      city: queries.city ? Like(`%${queries.city}%`) : Not(''),
+      modelYear:
+        queries.minYear || queries.maxYear
+          ? Between((queries.minYear ? queries.minYear : 1980), (queries.maxYear ? queries.maxYear : 2023)) : Not(''),
+      kilometer:
+        queries.minKilometer || queries.maxKilometer
+          ? Between((queries.minKilometer ? queries.minKilometer : 0), (queries.maxKilometer ? queries.maxKilometer : 150000)) : Not(''),
     }
 
-    if (!!options.query.brand) {
-      queryBuilder.andWhere(`brand like :brand`, {
-        brand: `%${options.query.brand}%`,
-      });
-    }
+    const adverts = await this.advertsRepository.findAndCount({
+      where: whereOptions,
+      skip: +options.limit * +options.page || 0,
+      take: +options.limit || 20
+    })
 
-    if (!!options.query.city) {
-      queryBuilder.andWhere(`city like :city`, {
-        city: `%${options.query.city}%`,
-      });
-    }
-
-    if (!!options.query.minYear) {
-      if (
-        !!options.query.maxYear &&
-        Number(options.query.maxYear) > Number(options.query.minYear)
-      ) {
-        queryBuilder
-          .andWhere('model_year <= :max', { max: options.query.maxYear })
-          .andWhere('model_year >= :min', { min: options.query.minYear });
-      } else {
-        queryBuilder.andWhere('model_year >= :min', {
-          min: options.query.minYear,
-        });
-      }
-    }
-
-    if (!!options.query.maxYear) {
-      if (
-        !!options.query.minYear &&
-        Number(options.query.maxPrice) > Number(options.query.minYear)
-      ) {
-        queryBuilder
-          .andWhere('model_year <= :max', { max: options.query.maxYear })
-          .andWhere('model_year >= :min', { min: options.query.minYear });
-      } else {
-        queryBuilder.andWhere('model_year <= :max', {
-          max: options.query.maxYear,
-        });
-      }
-    }
-
-    if (!!options.query.minPrice) {
-      if (
-        !!options.query.maxPrice &&
-        Number(options.query.maxPrice) > Number(options.query.minPrice)
-      ) {
-        queryBuilder
-          .andWhere('value <= :max', { max: options.query.maxPrice })
-          .andWhere('value >= :min', { min: options.query.minPrice });
-      } else {
-        queryBuilder.andWhere('value >= :min', {
-          min: options.query.minPrice,
-        });
-      }
-    }
-
-    if (!!options.query.maxPrice) {
-      if (
-        !!options.query.minPrice &&
-        Number(options.query.maxPrice) > Number(options.query.minPrice)
-      ) {
-        queryBuilder
-          .andWhere('value <= :max', { max: options.query.maxPrice })
-          .andWhere('value >= :min', { min: options.query.minPrice });
-      } else {
-        queryBuilder.andWhere('value <= :max', { max: options.query.maxPrice });
-      }
-    }
-
-    if (!!options.query.minKilometer) {
-      if (
-        !!options.query.maxKilometer &&
-        Number(options.query.maxKilometer) > Number(options.query.minKilometer)
-      ) {
-        queryBuilder
-          .andWhere('kilometer <= :max', { max: options.query.maxKilometer })
-          .andWhere('kilometer >= :min', { min: options.query.minKilometer });
-      } else {
-        queryBuilder.andWhere('kilometer >= :min', {
-          min: options.query.minKilometer,
-        });
-      }
-    }
-
-    if (!!options.query.maxKilometer) {
-      if (
-        !!options.query.minKilometer &&
-        Number(options.query.maxKilometer) > Number(options.query.minKilometer)
-      ) {
-        queryBuilder
-          .andWhere('kilometer <= :max', { max: options.query.maxKilometer })
-          .andWhere('kilometer >= :min', { min: options.query.minKilometer });
-      } else {
-        queryBuilder.andWhere('kilometer <= :max', {
-          max: options.query.maxKilometer,
-        });
-      }
-    }
-
-    queryBuilder.getMany();
-
-    return paginate(queryBuilder, options);
+    return adverts;
   }
 
   findOne(id: AdvertEntity['id']) {
@@ -169,8 +82,8 @@ export class AdvertsService {
           query.id
             ? `user_id = "${query.id}"`
             : query.advert
-            ? `id = "${query.advert}"`
-            : '',
+              ? `id = "${query.advert}"`
+              : '',
         )
         .select(`${!query.advert ? 'SUM(views)' : 'views'}`, 'count')
         .getRawOne();

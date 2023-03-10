@@ -26,7 +26,7 @@ export class AdvertsController {
   }
 
   @Get()
-  findAll(@Query('page') page = 1, @Query('limit') limit = 20, @Query() query) {
+  findAll(@Query('page') page, @Query('limit') limit = 20, @Query() query) {
     return this.advertsService.findAll({ page, limit, query });
   }
 
