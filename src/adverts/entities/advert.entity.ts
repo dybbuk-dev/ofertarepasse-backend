@@ -1,3 +1,4 @@
+import { FavoriteEntity } from 'src/favorites/entities/favorite.entity';
 import { UserEntity } from './../../users/entities/user.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -88,4 +90,7 @@ export class AdvertEntity {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.advert)
+  favorites: FavoriteEntity[];
 }
