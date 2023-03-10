@@ -1,3 +1,4 @@
+import { FavoriteEntity } from 'src/favorites/entities/favorite.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 import {
   Column,
@@ -7,6 +8,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import { Status } from '../enum/status.enum';
 import { Roles } from '../enum/roles.enum';
@@ -52,6 +54,9 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updated_at: string;
+
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.user)
+  favorites: FavoriteEntity[];
 
   @BeforeInsert()
   hasPassword() {
