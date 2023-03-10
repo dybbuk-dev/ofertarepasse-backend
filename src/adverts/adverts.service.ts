@@ -1,15 +1,11 @@
 import { AdvertEntity } from './entities/advert.entity';
-import { Like, Between, Repository, Not, } from 'typeorm';
+import { Like, Between, Repository, Not } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import {
-  IPaginationOptions,
-  Pagination,
-  paginate,
-} from 'nestjs-typeorm-paginate';
+import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
@@ -33,7 +29,7 @@ export class AdvertsService {
   constructor(
     @InjectRepository(AdvertEntity)
     private readonly advertsRepository: Repository<AdvertEntity>,
-  ) { }
+  ) {}
 
   async create(data: CreateAdvertDto) {
     const advert = this.advertsRepository.create(data);
@@ -50,22 +46,34 @@ export class AdvertsService {
       title: queries.title ? Like(`%${queries.title}%`) : Not(''),
       value:
         queries.minPrice || queries.maxPrice
-          ? Between((queries.minPrice ? queries.minPrice : 0), (queries.maxPrice ? queries.maxPrice : 100000)) : Not(''),
+          ? Between(
+              queries.minPrice ? queries.minPrice : 0,
+              queries.maxPrice ? queries.maxPrice : 100000,
+            )
+          : Not(''),
       brand: queries.brand ? Like(`%${queries.brand}%`) : Not(''),
       city: queries.city ? Like(`%${queries.city}%`) : Not(''),
       modelYear:
         queries.minYear || queries.maxYear
-          ? Between((queries.minYear ? queries.minYear : 1980), (queries.maxYear ? queries.maxYear : 2023)) : Not(''),
+          ? Between(
+              queries.minYear ? queries.minYear : 1980,
+              queries.maxYear ? queries.maxYear : 2023,
+            )
+          : Not(''),
       kilometer:
         queries.minKilometer || queries.maxKilometer
-          ? Between((queries.minKilometer ? queries.minKilometer : 0), (queries.maxKilometer ? queries.maxKilometer : 150000)) : Not(''),
-    }
+          ? Between(
+              queries.minKilometer ? queries.minKilometer : 0,
+              queries.maxKilometer ? queries.maxKilometer : 150000,
+            )
+          : Not(''),
+    };
 
     const adverts = await this.advertsRepository.findAndCount({
       where: whereOptions,
-      skip: +options.limit * +options.page || 0,
-      take: +options.limit || 20
-    })
+      skip: +options.page > 1 ? +options.limit * +options.page : 0,
+      take: +options.limit || 20,
+    });
 
     return adverts;
   }
@@ -82,8 +90,8 @@ export class AdvertsService {
           query.id
             ? `user_id = "${query.id}"`
             : query.advert
-              ? `id = "${query.advert}"`
-              : '',
+            ? `id = "${query.advert}"`
+            : '',
         )
         .select(`${!query.advert ? 'SUM(views)' : 'views'}`, 'count')
         .getRawOne();
