@@ -3,15 +3,17 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorites.service';
 import { CreateFavoriteDto } from './dto/create-favorite.dto';
 import { FavoriteEntity } from './entities/favorite.entity';
+import { AuthGuard } from '@nestjs/passport';
 
+@UseGuards(AuthGuard('jwt'))
 @Controller('/api/v1/favorites')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
