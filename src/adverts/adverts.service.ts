@@ -71,7 +71,7 @@ export class AdvertsService {
 
     const adverts = await this.advertsRepository.findAndCount({
       where: whereOptions,
-      skip: +options.page > 1 ? +options.limit * +options.page : 0,
+      skip: +options.page > 1 ? +options.limit * (+options.page - 1) : 0,
       take: +options.limit || 20,
     });
 
