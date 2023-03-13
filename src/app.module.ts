@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdvertsModule } from './adverts/adverts.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FavoritesModule } from './favorites/favorites.module';
     AuthModule,
     AdvertsModule,
     FavoritesModule,
+    S3Module,
   ],
   controllers: [],
   providers: [],

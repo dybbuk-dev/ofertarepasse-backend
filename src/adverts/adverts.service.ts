@@ -6,6 +6,7 @@ import { UpdateAdvertDto } from './dto/update-advert.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { S3Service } from 'src/s3/s3.service';
 
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
@@ -29,6 +30,7 @@ export class AdvertsService {
   constructor(
     @InjectRepository(AdvertEntity)
     private readonly advertsRepository: Repository<AdvertEntity>,
+    private readonly s3Services: S3Service,
   ) {}
 
   async create(data: CreateAdvertDto) {
@@ -37,6 +39,22 @@ export class AdvertsService {
     await this.advertsRepository.save(advert);
 
     return advert;
+  }
+
+  async uploadFiles(files: Express.Multer.File[], id: string) {
+    const advert = await this.findOne(id);
+
+    if (advert) {
+      try {
+        const keys: Array<string> = await this.s3Services.uploadFiles(files);
+
+        await this.update(id, { images: keys });
+      } catch (err) {
+        throw new HttpException(err.message, 500);
+      }
+    } else {
+      throw new HttpException('Advert not found', 400);
+    }
   }
 
   async findAll(options: IOptionsFindAll): Promise<any> {
