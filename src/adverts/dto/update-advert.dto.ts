@@ -5,29 +5,29 @@ import { AdvertEntity } from '../entities/advert.entity';
 export class UpdateAdvertDto {
   @ApiProperty()
   @IsOptional()
-  title: AdvertEntity['title'];
+  title?: AdvertEntity['title'];
 
   @ApiProperty()
   @IsOptional()
-  images: AdvertEntity['images'];
+  images?: AdvertEntity['images'];
 
   @ApiProperty()
   @IsOptional()
-  kilometer: AdvertEntity['kilometer'];
+  kilometer?: AdvertEntity['kilometer'];
 
   @ApiProperty()
   @IsOptional()
-  value: AdvertEntity['value'];
+  value?: AdvertEntity['value'];
 
   @ApiProperty()
   @IsOptional()
-  about: AdvertEntity['about'];
+  about?: AdvertEntity['about'];
 
   @ApiProperty()
   @IsOptional()
-  alert: AdvertEntity['alert'];
+  alert?: AdvertEntity['alert'];
 
   @ApiProperty()
   @IsOptional()
-  highlight: AdvertEntity['highlight'];
+  highlight?: AdvertEntity['highlight'];
 }

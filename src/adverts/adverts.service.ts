@@ -6,6 +6,7 @@ import { UpdateAdvertDto } from './dto/update-advert.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
+import { S3Service } from 'src/s3/s3.service';
 
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
@@ -29,6 +30,7 @@ export class AdvertsService {
   constructor(
     @InjectRepository(AdvertEntity)
     private readonly advertsRepository: Repository<AdvertEntity>,
+    private readonly s3Services: S3Service,
   ) {}
 
   async create(data: CreateAdvertDto) {
@@ -37,6 +39,30 @@ export class AdvertsService {
     await this.advertsRepository.save(advert);
 
     return advert;
+  }
+
+  async uploadFiles(files: Express.Multer.File[], id: string) {
+    const advert = await this.findOne(id);
+
+    if (advert) {
+      try {
+        const keys: Array<string> = await this.s3Services.uploadFiles(files);
+
+        await this.update(id, { images: keys });
+      } catch (err) {
+        throw new HttpException(err.message, 500);
+      }
+    } else {
+      throw new HttpException('Advert not found', 400);
+    }
+  }
+
+  async deleteFiles(files: string[]) {
+    try {
+      return await this.s3Services.deleteFiles(files);
+    } catch (err) {
+      throw new HttpException(err.message, 500);
+    }
   }
 
   async findAll(options: IOptionsFindAll): Promise<any> {
@@ -69,16 +95,19 @@ export class AdvertsService {
           : Not(''),
     };
 
-    const adverts = await this.advertsRepository.findAndCount({
+    const [items, count] = await this.advertsRepository.findAndCount({
       where: whereOptions,
       skip: +options.page > 1 ? +options.limit * (+options.page - 1) : 0,
       take: +options.limit || 20,
     });
 
-    return adverts;
+    return {
+      items,
+      count,
+    };
   }
 
-  findOne(id: AdvertEntity['id']) {
+  async findOne(id: AdvertEntity['id']) {
     return this.advertsRepository.findOne({ where: { id } });
   }
 
