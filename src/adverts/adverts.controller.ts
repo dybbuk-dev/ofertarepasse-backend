@@ -39,6 +39,12 @@ export class AdvertsController {
     return this.advertsService.uploadFiles(files, id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
+  @Post('/delete-file')
+  async deleteImage(@Body('files') files: Array<string>) {
+    return this.advertsService.deleteFiles(files);
+  }
+
   @Get()
   findAll(@Query('page') page = 1, @Query('limit') limit = 20, @Query() query) {
     return this.advertsService.findAll({ page, limit, query });

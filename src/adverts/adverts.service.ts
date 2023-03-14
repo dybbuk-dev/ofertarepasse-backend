@@ -57,6 +57,14 @@ export class AdvertsService {
     }
   }
 
+  async deleteFiles(files: string[]) {
+    try {
+      return await this.s3Services.deleteFiles(files);
+    } catch (err) {
+      throw new HttpException(err.message, 500);
+    }
+  }
+
   async findAll(options: IOptionsFindAll): Promise<any> {
     const queries = options.query;
 
@@ -87,16 +95,19 @@ export class AdvertsService {
           : Not(''),
     };
 
-    const adverts = await this.advertsRepository.findAndCount({
+    const [items, count] = await this.advertsRepository.findAndCount({
       where: whereOptions,
       skip: +options.page > 1 ? +options.limit * (+options.page - 1) : 0,
       take: +options.limit || 20,
     });
 
-    return adverts;
+    return {
+      items,
+      count,
+    };
   }
 
-  findOne(id: AdvertEntity['id']) {
+  async findOne(id: AdvertEntity['id']) {
     return this.advertsRepository.findOne({ where: { id } });
   }
 
