@@ -36,6 +36,15 @@ export class UserEntity {
   @Column()
   type: TypePerson;
 
+  @Column({ default: null })
+  cpf: string;
+
+  @Column({ default: null })
+  cnpj: string;
+
+  @Column({ default: null })
+  cep: string;
+
   @Column({ default: 'user' })
   roles: Roles;
 
@@ -46,7 +55,7 @@ export class UserEntity {
   @Column({ default: Status['active'] })
   status: Status;
 
-  @Column({ type: 'date', nullable: true, default: null })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   dateOfBirth: Date;
 
   @CreateDateColumn()

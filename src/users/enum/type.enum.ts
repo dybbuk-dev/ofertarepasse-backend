@@ -1,4 +1,4 @@
 export enum TypePerson {
-  prysical = 'prysical',
+  prysical = 'physical',
   legal = 'legal',
 }

@@ -4,12 +4,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOneOptions } from 'typeorm';
+import { S3Service } from 'src/s3/s3.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
+    private readonly s3Service: S3Service,
   ) {}
 
   async create(data: CreateUserDto) {
@@ -34,6 +36,22 @@ export class UsersService {
 
     user.password = undefined;
     return user;
+  }
+
+  async uploadImage(id: string, file: Express.Multer.File) {
+    const { error, user } = await this.findOne({ where: { id } });
+
+    if (error) {
+      throw new Error('Failed upload image');
+    } else {
+      if (user.image) {
+        await this.s3Service.deleteFile(user.image);
+      }
+
+      const key = await this.s3Service.uploadFile(file);
+
+      await this.update(id, { image: key });
+    }
   }
 
   async findAll() {
