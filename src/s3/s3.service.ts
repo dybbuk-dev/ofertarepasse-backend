@@ -56,6 +56,35 @@ export class S3Service {
     return keys;
   }
 
+  async uploadFile(file: Express.Multer.File): Promise<string> {
+    const bucket = process.env.S3_BUCKET;
+    let key = null;
+
+    const input: PutObjectCommandInput = {
+      Body: file.buffer,
+      Bucket: bucket,
+      Key: randomUUID(),
+      ContentType: file.mimetype,
+      ACL: 'public-read',
+    };
+
+    try {
+      const response: PutObjectCommandOutput = await this.s3.send(
+        new PutObjectCommand(input),
+      );
+
+      if (response.$metadata.httpStatusCode === 200) {
+        key = input.Key;
+      } else {
+        throw new Error('Image not saved to s3!');
+      }
+    } catch (err) {
+      throw err;
+    }
+
+    return key;
+  }
+
   async deleteFiles(files: string[]) {
     const bucket = process.env.S3_BUCKET;
 
@@ -74,6 +103,25 @@ export class S3Service {
       } catch (err) {
         throw err;
       }
+    }
+  }
+
+  async deleteFile(key: string) {
+    const bucket = process.env.S3_BUCKET;
+
+    const command = new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    });
+
+    try {
+      const response: DeleteObjectCommandOutput = await this.s3.send(command);
+
+      if (response.$metadata.httpStatusCode !== 204) {
+        throw new Error('Erro deleting images');
+      }
+    } catch (err) {
+      throw err;
     }
   }
 }

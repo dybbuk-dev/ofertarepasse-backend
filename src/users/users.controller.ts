@@ -11,10 +11,13 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('/api/v1/users')
 export class UsersController {
@@ -23,6 +26,16 @@ export class UsersController {
   @Post()
   create(@Body() body: CreateUserDto) {
     return this.usersService.create(body);
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @UseInterceptors(FileInterceptor('file'))
+  @Post(':id/upload-file')
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.usersService.uploadImage(id, file);
   }
 
   @UseGuards(AuthGuard('jwt'))
