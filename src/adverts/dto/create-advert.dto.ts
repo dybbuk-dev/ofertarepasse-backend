@@ -48,7 +48,7 @@ export class CreateAdvertDto {
   alert: AdvertEntity['alert'];
 
   @IsNotEmpty()
-  userId: AdvertEntity['userId'];
+  user: AdvertEntity['user'];
 
   @IsNotEmpty()
   @IsOptional()

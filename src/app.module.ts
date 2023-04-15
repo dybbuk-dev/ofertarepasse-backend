@@ -8,6 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { AdvertsModule } from './adverts/adverts.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { S3Module } from './s3/s3.module';
+import { NegociationsModule } from './negociations/negociations.module';
+import { EmailsModule } from './emails/emails.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -22,11 +26,24 @@ import { S3Module } from './s3/s3.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: 'smtp.titan.email',
+        port: 587,
+        auth: {
+          user: 'nao-responder@bradypus.com.br',
+          pass: 'zqXBmTNc9t',
+        },
+      },
+    }),
     UsersModule,
     AuthModule,
     AdvertsModule,
     FavoritesModule,
     S3Module,
+    NegociationsModule,
+    EmailsModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],

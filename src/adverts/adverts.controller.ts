@@ -52,7 +52,7 @@ export class AdvertsController {
 
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: AdvertEntity['id']) {
-    return this.advertsService.findOne(id);
+    return this.advertsService.findOne({ where: { id } });
   }
 
   @UseGuards(AuthGuard('jwt'))

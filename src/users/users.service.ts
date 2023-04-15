@@ -16,7 +16,7 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     if (data.email) {
-      const { user } = await this.findOne({
+      const user = await this.findOne({
         where: {
           email: data.email,
         },
@@ -39,19 +39,15 @@ export class UsersService {
   }
 
   async uploadImage(id: string, file: Express.Multer.File) {
-    const { error, user } = await this.findOne({ where: { id } });
+    const user = await this.findOne({ where: { id } });
 
-    if (error) {
-      throw new Error('Failed upload image');
-    } else {
-      if (user.image) {
-        await this.s3Service.deleteFile(user.image);
-      }
-
-      const key = await this.s3Service.uploadFile(file);
-
-      await this.update(id, { image: key });
+    if (user.image) {
+      await this.s3Service.deleteFile(user.image);
     }
+
+    const key = await this.s3Service.uploadFile(file);
+
+    await this.update(id, { image: key });
   }
 
   async findAll() {
@@ -59,28 +55,14 @@ export class UsersService {
   }
 
   async findOne(options: FindOneOptions<UserEntity>) {
-    try {
-      const user = await this.usersRepository.findOneOrFail(options);
-
-      return {
-        error: false,
-        user,
-      };
-    } catch (error) {
-      return {
-        error: true,
-        message: error.message,
-      };
-    }
+    return this.usersRepository.findOneOrFail(options);
   }
 
   async update(id: string, data: UpdateUserDto) {
-    const { error, user } = await this.findOne({ where: { id } });
+    const user = await this.findOne({ where: { id } });
 
-    if (!error) {
-      this.usersRepository.merge(user, data);
-      return await this.usersRepository.save(user);
-    }
+    this.usersRepository.merge(user, data);
+    return await this.usersRepository.save(user);
   }
 
   async remove(id: string) {

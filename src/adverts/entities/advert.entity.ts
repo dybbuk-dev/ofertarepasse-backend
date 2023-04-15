@@ -4,12 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { NegociationEntity } from 'src/negociations/entities/negociation.entity';
 
 @Entity({ name: 'adverts' })
 export class AdvertEntity {
@@ -64,9 +64,8 @@ export class AdvertEntity {
   @Column({ nullable: true, default: null })
   alert: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.id)
-  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  userId: string;
+  @ManyToOne(() => UserEntity, (user) => user.adverts)
+  user: UserEntity;
 
   @Column({ default: 0 })
   views: number;
@@ -93,4 +92,7 @@ export class AdvertEntity {
 
   @OneToMany(() => FavoriteEntity, (favorite) => favorite.advert)
   favorites: FavoriteEntity[];
+
+  @OneToMany(() => NegociationEntity, (negociation) => negociation.advert)
+  negociations: NegociationEntity[];
 }
