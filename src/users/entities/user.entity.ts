@@ -47,6 +47,9 @@ export class UserEntity {
   @Column({ default: null })
   cep: string;
 
+  @Column({ default: null })
+  pix: string;
+
   @Column({ default: 'user' })
   roles: Roles;
 

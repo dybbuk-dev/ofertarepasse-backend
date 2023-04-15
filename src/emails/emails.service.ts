@@ -9,7 +9,7 @@ export class EmailsService {
     this.mailerService.sendMail({
       to: email,
       from: 'nao-responder@bradypus.com.br',
-      subject: 'Negociação iniciada',
+      subject: title,
       text: text,
     });
   }

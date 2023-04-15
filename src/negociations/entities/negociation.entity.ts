@@ -17,6 +17,9 @@ export class NegociationEntity {
   @ManyToOne(() => UserEntity, (user) => user.negociations)
   user: UserEntity;
 
+  @ManyToOne(() => UserEntity, (user) => user.negociations)
+  intermediary: UserEntity;
+
   @ManyToOne(() => AdvertEntity, (advert) => advert.negociations)
   advert: AdvertEntity;
 
