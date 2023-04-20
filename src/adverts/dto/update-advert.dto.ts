@@ -1,8 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { AdvertEntity } from '../entities/advert.entity';
+import { CreateAdvertDto } from './create-advert.dto';
 
-export class UpdateAdvertDto {
+export class UpdateAdvertDto extends PartialType(CreateAdvertDto) {
   @ApiProperty()
   @IsOptional()
   title?: AdvertEntity['title'];

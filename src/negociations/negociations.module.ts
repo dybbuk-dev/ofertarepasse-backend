@@ -14,5 +14,6 @@ import { AdvertsModule } from 'src/adverts/adverts.module';
   ],
   controllers: [NegociationsController],
   providers: [NegociationsService],
+  exports: [NegociationsService],
 })
 export class NegociationsModule {}

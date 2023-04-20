@@ -5,8 +5,8 @@ import { FindOneOptions, Not, Repository } from 'typeorm';
 import { CreateNegociationDto } from './dto/create-negociation.dto';
 import { UpdateNegociationDto } from './dto/update-negociation.dto';
 import { NegociationEntity } from './entities/negociation.entity';
-import { EmailsService } from 'src/emails/emails.service';
-import { AdvertsService } from 'src/adverts/adverts.service';
+// import { EmailsService } from 'src/emails/emails.service';
+// import { AdvertsService } from 'src/adverts/adverts.service';
 import { MercadoPago } from 'mercadopago/interface';
 const mercadopago: MercadoPago = require('mercadopago');
 
@@ -14,39 +14,41 @@ const mercadopago: MercadoPago = require('mercadopago');
 export class NegociationsService {
   constructor(
     @InjectRepository(NegociationEntity)
-    private readonly negociationsRepository: Repository<NegociationEntity>,
-    private readonly emailsServices: EmailsService,
-    private readonly advertServices: AdvertsService,
+    private readonly negociationsRepository: Repository<NegociationEntity>, // private readonly emailsServices: EmailsService, // private readonly advertServices: AdvertsService,
   ) {}
 
   async create(data: CreateNegociationDto) {
     const negociation = this.negociationsRepository.create(data);
     const saveNegociation = await this.negociationsRepository.save(negociation);
 
-    const advert = await this.advertServices.findOne({
-      where: {
-        id: saveNegociation.advert,
-      },
-      relations: ['user'],
-    });
+    // const advert = await this.advertServices.findOne({
+    //   where: {
+    //     id: data.advert,
+    //   },
+    //   relations: ['user'],
+    // });
 
-    await this.emailsServices.negociation(
-      advert.user.email,
-      'Negociação Iniciada',
-      `Uma negociação foi aberta para o seu anúncio: ${advert.title}`,
-    );
+    // await this.emailsServices.negociation(
+    //   advert.user.email,
+    //   'Negociação Iniciada',
+    //   `Uma negociação foi aberta para o seu anúncio: ${advert.title}`,
+    // );
 
     return saveNegociation;
   }
 
-  findAll(user: string) {
+  findAll(user: string, limit: string) {
     return this.negociationsRepository.find({
       where: {
-        user: {
-          id: user ? user : Not(''),
+        advert: {
+          user: user ? user : Not(''),
         },
       },
-      relations: ['advert'],
+      order: {
+        status: 'DESC',
+      },
+      take: +limit <= 20 && +limit > 0 ? +limit : 20,
+      relations: ['advert', 'advert.user', 'user'],
     });
   }
 

@@ -16,7 +16,7 @@ export class UsersService {
 
   async create(data: CreateUserDto) {
     if (data.email) {
-      const user = await this.findOne({
+      const user = await this.usersRepository.findOne({
         where: {
           email: data.email,
         },

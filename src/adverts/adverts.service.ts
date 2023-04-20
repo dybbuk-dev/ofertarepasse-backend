@@ -10,6 +10,7 @@ import { S3Service } from 'src/s3/s3.service';
 
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
+    userId: string;
     title: string;
     brand: string;
     city: string;
@@ -69,6 +70,7 @@ export class AdvertsService {
     const queries = options.query;
 
     const whereOptions = {
+      user: { id: queries.userId ? queries.userId : Not('') },
       title: queries.title ? Like(`%${queries.title}%`) : Not(''),
       value:
         queries.minPrice || queries.maxPrice
@@ -93,6 +95,7 @@ export class AdvertsService {
               queries.maxKilometer ? queries.maxKilometer : 150000,
             )
           : Not(''),
+      active: true,
     };
 
     const [items, count] = await this.advertsRepository.findAndCount({
@@ -113,6 +116,13 @@ export class AdvertsService {
 
   async views(query: { id?: string; advert?: string }) {
     try {
+      // const adverts = await this.advertsRepository.findAndCount({
+      //   where: {
+      //     user: {
+      //       id: query.id ? query.id : Not('')
+      //     }
+      //   }
+      // })
       const adverts = await this.advertsRepository
         .createQueryBuilder()
         .where(
