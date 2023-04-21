@@ -37,12 +37,13 @@ export class NegociationsService {
     return saveNegociation;
   }
 
-  findAll(user: string, limit: string) {
-    return this.negociationsRepository.find({
+  async findAll(user: string, limit: string, status: string) {
+    const [items, count] = await this.negociationsRepository.findAndCount({
       where: {
         advert: {
           user: user ? user : Not(''),
         },
+        status: status ? status : Not(''),
       },
       order: {
         status: 'DESC',
@@ -50,6 +51,8 @@ export class NegociationsService {
       take: +limit <= 20 && +limit > 0 ? +limit : 20,
       relations: ['advert', 'advert.user', 'user'],
     });
+
+    return { items, count };
   }
 
   findOne(options: FindOneOptions<NegociationEntity>) {

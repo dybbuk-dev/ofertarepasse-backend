@@ -22,8 +22,12 @@ export class NegociationsController {
   }
 
   @Get()
-  findAll(@Query('userId') user: string, @Query('limit') limit: string) {
-    return this.negociationsService.findAll(user, limit);
+  findAll(
+    @Query('userId') user: string,
+    @Query('limit') limit: string,
+    @Query('status') status: string,
+  ) {
+    return this.negociationsService.findAll(user, limit, status);
   }
 
   @Get(':id')
