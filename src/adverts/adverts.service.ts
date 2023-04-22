@@ -116,13 +116,6 @@ export class AdvertsService {
 
   async views(query: { id?: string; advert?: string }) {
     try {
-      // const adverts = await this.advertsRepository.findAndCount({
-      //   where: {
-      //     user: {
-      //       id: query.id ? query.id : Not('')
-      //     }
-      //   }
-      // })
       const adverts = await this.advertsRepository
         .createQueryBuilder()
         .where(
@@ -142,6 +135,23 @@ export class AdvertsService {
     } catch (err) {
       console.log(err);
 
+      return {
+        error: true,
+        message: 'Failed get view',
+      };
+    }
+  }
+
+  async recommendation() {
+    try {
+      return this.advertsRepository
+        .createQueryBuilder('adverts')
+        .select()
+        .where('adverts.active = true')
+        .orderBy('RAND()')
+        .getMany();
+    } catch (err) {
+      console.log(err);
       return {
         error: true,
         message: 'Failed get view',

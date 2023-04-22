@@ -61,6 +61,11 @@ export class AdvertsController {
     return this.advertsService.views(query);
   }
 
+  @Post('/recommendation')
+  recommendation() {
+    return this.advertsService.recommendation();
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   update(

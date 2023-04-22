@@ -31,4 +31,8 @@ export class UpdateAdvertDto extends PartialType(CreateAdvertDto) {
   @ApiProperty()
   @IsOptional()
   highlight?: AdvertEntity['highlight'];
+
+  @ApiProperty()
+  @IsOptional()
+  views?: AdvertEntity['views'];
 }
