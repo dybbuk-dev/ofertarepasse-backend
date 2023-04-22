@@ -1,5 +1,5 @@
 import { AdvertEntity } from './entities/advert.entity';
-import { Like, Between, Repository, Not } from 'typeorm';
+import { Like, Between, Repository, Not, FindOneOptions } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
@@ -10,6 +10,7 @@ import { S3Service } from 'src/s3/s3.service';
 
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
+    userId: string;
     title: string;
     brand: string;
     city: string;
@@ -42,7 +43,7 @@ export class AdvertsService {
   }
 
   async uploadFiles(files: Express.Multer.File[], id: string) {
-    const advert = await this.findOne(id);
+    const advert = await this.findOne({ where: { id } });
 
     if (advert) {
       try {
@@ -69,6 +70,7 @@ export class AdvertsService {
     const queries = options.query;
 
     const whereOptions = {
+      user: { id: queries.userId ? queries.userId : Not('') },
       title: queries.title ? Like(`%${queries.title}%`) : Not(''),
       value:
         queries.minPrice || queries.maxPrice
@@ -93,6 +95,7 @@ export class AdvertsService {
               queries.maxKilometer ? queries.maxKilometer : 150000,
             )
           : Not(''),
+      active: true,
     };
 
     const [items, count] = await this.advertsRepository.findAndCount({
@@ -107,17 +110,24 @@ export class AdvertsService {
     };
   }
 
-  async findOne(id: AdvertEntity['id']) {
-    return this.advertsRepository.findOne({ where: { id } });
+  async findOne(options: FindOneOptions<AdvertEntity>) {
+    return this.advertsRepository.findOne(options);
   }
 
   async views(query: { id?: string; advert?: string }) {
     try {
+      // const adverts = await this.advertsRepository.findAndCount({
+      //   where: {
+      //     user: {
+      //       id: query.id ? query.id : Not('')
+      //     }
+      //   }
+      // })
       const adverts = await this.advertsRepository
         .createQueryBuilder()
         .where(
           query.id
-            ? `user_id = "${query.id}"`
+            ? `userId = "${query.id}"`
             : query.advert
             ? `id = "${query.advert}"`
             : '',
@@ -140,7 +150,7 @@ export class AdvertsService {
   }
 
   async update(id: AdvertEntity['id'], data: UpdateAdvertDto) {
-    const advert = await this.findOne(id);
+    const advert = await this.findOne({ where: { id } });
 
     if (advert) {
       this.advertsRepository.merge(advert, data);
@@ -149,7 +159,7 @@ export class AdvertsService {
   }
 
   async remove(id: AdvertEntity['id']) {
-    const advert = await this.findOne(id);
+    const advert = await this.findOne({ where: { id } });
 
     if (advert) {
       return this.advertsRepository.delete(id);

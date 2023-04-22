@@ -9,5 +9,6 @@ import { S3Module } from 'src/s3/s3.module';
   imports: [TypeOrmModule.forFeature([AdvertEntity]), S3Module],
   controllers: [AdvertsController],
   providers: [AdvertsService],
+  exports: [AdvertsService],
 })
 export class AdvertsModule {}

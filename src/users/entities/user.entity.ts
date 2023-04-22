@@ -14,6 +14,8 @@ import { Status } from '../enum/status.enum';
 import { Roles } from '../enum/roles.enum';
 import { TypePerson } from '../enum/type.enum';
 import { hashSync } from 'bcrypt';
+import { NegociationEntity } from 'src/negociations/entities/negociation.entity';
+import { AdvertEntity } from 'src/adverts/entities/advert.entity';
 
 @Entity('users')
 @Unique(['email'])
@@ -45,6 +47,9 @@ export class UserEntity {
   @Column({ default: null })
   cep: string;
 
+  @Column({ default: null })
+  pix: string;
+
   @Column({ default: 'user' })
   roles: Roles;
 
@@ -66,6 +71,12 @@ export class UserEntity {
 
   @OneToMany(() => FavoriteEntity, (favorite) => favorite.user)
   favorites: FavoriteEntity[];
+
+  @OneToMany(() => NegociationEntity, (negociations) => negociations.user)
+  negociations: NegociationEntity[];
+
+  @OneToMany(() => AdvertEntity, (advert) => advert.user)
+  adverts: AdvertEntity[];
 
   @BeforeInsert()
   hasPassword() {
