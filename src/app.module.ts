@@ -5,6 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { AdvertsModule } from './adverts/adverts.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { S3Module } from './s3/s3.module';
+import { NegociationsModule } from './negociations/negociations.module';
+import { EmailsModule } from './emails/emails.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -19,8 +26,24 @@ import { AuthModule } from './auth/auth.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    MailerModule.forRoot({
+      transport: {
+        host: '',
+        port: 587,
+        auth: {
+          user: '',
+          pass: '',
+        },
+      },
+    }),
     UsersModule,
     AuthModule,
+    AdvertsModule,
+    FavoritesModule,
+    S3Module,
+    NegociationsModule,
+    EmailsModule,
+    PaymentsModule,
   ],
   controllers: [],
   providers: [],

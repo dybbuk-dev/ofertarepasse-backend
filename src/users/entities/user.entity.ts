@@ -1,3 +1,4 @@
+import { FavoriteEntity } from 'src/favorites/entities/favorite.entity';
 import { ApiHideProperty } from '@nestjs/swagger';
 import {
   Column,
@@ -7,17 +8,23 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  OneToMany,
 } from 'typeorm';
 import { Status } from '../enum/status.enum';
 import { Roles } from '../enum/roles.enum';
 import { TypePerson } from '../enum/type.enum';
 import { hashSync } from 'bcrypt';
+import { NegociationEntity } from 'src/negociations/entities/negociation.entity';
+import { AdvertEntity } from 'src/adverts/entities/advert.entity';
 
 @Entity('users')
 @Unique(['email'])
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ nullable: true, default: null })
+  image: string;
 
   @Column()
   name: string;
@@ -31,6 +38,18 @@ export class UserEntity {
   @Column()
   type: TypePerson;
 
+  @Column({ default: null })
+  cpf: string;
+
+  @Column({ default: null })
+  cnpj: string;
+
+  @Column({ default: null })
+  cep: string;
+
+  @Column({ default: null })
+  pix: string;
+
   @Column({ default: 'user' })
   roles: Roles;
 
@@ -41,7 +60,7 @@ export class UserEntity {
   @Column({ default: Status['active'] })
   status: Status;
 
-  @Column({ type: 'date', nullable: true, default: null })
+  @Column({ type: 'timestamp', nullable: true, default: null })
   dateOfBirth: Date;
 
   @CreateDateColumn()
@@ -49,6 +68,15 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updated_at: string;
+
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.user)
+  favorites: FavoriteEntity[];
+
+  @OneToMany(() => NegociationEntity, (negociations) => negociations.user)
+  negociations: NegociationEntity[];
+
+  @OneToMany(() => AdvertEntity, (advert) => advert.user)
+  adverts: AdvertEntity[];
 
   @BeforeInsert()
   hasPassword() {

@@ -24,7 +24,7 @@ export class AuthService {
 
       return {
         ...verifyUser,
-        token: this.jwtService.sign({ email: user.email }),
+        token: this.jwtService.sign({ email: user.email, id: verifyUser.id }),
       };
     }
 
@@ -35,25 +35,21 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string) {
-    const { error, user: userData } = await this.usersService.findOne({
+    const userFind = await this.usersService.findOne({
       select: ['id', 'email', 'password'],
       where: { email },
     });
 
-    if (!error) {
-      const isPasswordValid = compareSync(password, userData.password);
+    const isPasswordValid = compareSync(password, userFind.password);
 
-      if (!isPasswordValid) return null;
+    if (!isPasswordValid) return null;
 
-      const { user } = await this.usersService.findOne({
-        where: {
-          email,
-        },
-      });
+    const user = await this.usersService.findOne({
+      where: {
+        email,
+      },
+    });
 
-      return user;
-    } else {
-      return false;
-    }
+    return user;
   }
 }
