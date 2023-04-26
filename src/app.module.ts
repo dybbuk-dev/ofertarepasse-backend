@@ -28,11 +28,11 @@ import { PaymentsModule } from './payments/payments.module';
     }),
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.titan.email',
+        host: '',
         port: 587,
         auth: {
-          user: 'nao-responder@bradypus.com.br',
-          pass: 'zqXBmTNc9t',
+          user: '',
+          pass: '',
         },
       },
     }),
