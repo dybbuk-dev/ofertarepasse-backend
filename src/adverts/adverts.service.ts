@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
 import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { S3Service } from 'src/s3/s3.service';
+import { ResearchesService } from 'src/researches/researches.service';
 
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
@@ -32,10 +33,13 @@ export class AdvertsService {
     @InjectRepository(AdvertEntity)
     private readonly advertsRepository: Repository<AdvertEntity>,
     private readonly s3Services: S3Service,
+    private readonly researchesServices: ResearchesService,
   ) {}
 
   async create(data: CreateAdvertDto) {
     const advert = this.advertsRepository.create(data);
+
+    await this.researchesServices.create({ text: data.title, access: 0 });
 
     await this.advertsRepository.save(advert);
 
@@ -149,9 +153,9 @@ export class AdvertsService {
         .select()
         .where('adverts.active = true')
         .orderBy('RAND()')
+        .limit(5)
         .getMany();
     } catch (err) {
-      console.log(err);
       return {
         error: true,
         message: 'Failed get view',

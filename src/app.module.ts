@@ -12,6 +12,7 @@ import { NegociationsModule } from './negociations/negociations.module';
 import { EmailsModule } from './emails/emails.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PaymentsModule } from './payments/payments.module';
+import { ResearchesModule } from './researches/researches.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { PaymentsModule } from './payments/payments.module';
     NegociationsModule,
     EmailsModule,
     PaymentsModule,
+    ResearchesModule,
   ],
   controllers: [],
   providers: [],
