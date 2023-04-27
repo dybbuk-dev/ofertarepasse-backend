@@ -8,7 +8,7 @@ export class CreateAdvertDto {
   plate: AdvertEntity['plate'];
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Título não pode ser em branco' })
   title: AdvertEntity['title'];
 
   @ApiProperty()
@@ -44,11 +44,11 @@ export class CreateAdvertDto {
   color: AdvertEntity['color'];
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Quanto você rodou com seu veículo?' })
   kilometer: AdvertEntity['kilometer'];
 
   @ApiProperty()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Você precisa colocar um valor para seu anúncio' })
   value: AdvertEntity['value'];
 
   @ApiProperty()
