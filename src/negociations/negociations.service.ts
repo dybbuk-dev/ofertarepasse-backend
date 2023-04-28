@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Not, Repository } from 'typeorm';
+import { FindOneOptions, Like, Not, Repository } from 'typeorm';
 import { CreateNegociationDto } from './dto/create-negociation.dto';
 import { UpdateNegociationDto } from './dto/update-negociation.dto';
 import { NegociationEntity } from './entities/negociation.entity';
@@ -37,10 +37,17 @@ export class NegociationsService {
     return saveNegociation;
   }
 
-  async findAll(user: string, limit: string, status: string) {
+  async findAll(
+    user: string,
+    limit: number,
+    status: string,
+    page: number,
+    search: string,
+  ) {
     const [items, count] = await this.negociationsRepository.findAndCount({
       where: {
         advert: {
+          title: search ? Like(`%${search}%`) : Not(''),
           user: user ? user : Not(''),
         },
         status: status ? status : Not(''),
@@ -48,7 +55,8 @@ export class NegociationsService {
       order: {
         status: 'DESC',
       },
-      take: +limit <= 20 && +limit > 0 ? +limit : 20,
+      take: limit <= 20 && limit > 0 ? limit : 20,
+      skip: page > 1 ? limit * (page - 1) : 0,
       relations: ['advert', 'advert.user', 'user'],
     });
 
