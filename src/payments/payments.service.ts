@@ -6,11 +6,16 @@ import { UsersService } from 'src/users/users.service';
 import { AdvertsService } from 'src/adverts/adverts.service';
 import { EmailsService } from 'src/emails/emails.service';
 import { NegociationsService } from './../negociations/negociations.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PaymentEntity } from './entities/payment.entity';
+import { Repository } from 'typeorm';
 const mercadopago: MercadoPago = require('mercadopago');
 
 @Injectable()
 export class PaymentsService {
   constructor(
+    @InjectRepository(PaymentEntity)
+    private readonly paymentRepository: Repository<PaymentEntity>,
     private readonly userServices: UsersService,
     private readonly advertsService: AdvertsService,
     private readonly emailsServices: EmailsService,
@@ -18,50 +23,60 @@ export class PaymentsService {
   ) {}
 
   async create(data: CreatePaymentDto) {
-    mercadopago.configure({
-      access_token: process.env.MERCADOPAGO_ACCESS_TOKEN_TESTE,
-    });
+    try {
+      mercadopago.configure({
+        access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
+      });
 
-    const advert = await this.advertsService.findOne({
-      where: { id: data.advert },
-    });
+      const advert = await this.advertsService.findOne({
+        where: { id: data.advert },
+      });
 
-    const userPayer = await this.userServices.findOne({
-      where: { id: data.userPayer },
-    });
+      const userPayer = await this.userServices.findOne({
+        where: { id: data.payer },
+      });
 
-    const preference = {
-      items: [
-        {
-          title: advert.title,
-          description: advert.about,
-          currency_id: 'BRL',
-          quantity: 1,
-          unit_price: advert.value,
+      const preference = {
+        items: [
+          {
+            title: advert.title,
+            description: advert.about,
+            currency_id: 'BRL',
+            quantity: 1,
+            unit_price: advert.value,
+          },
+        ],
+        payer: {
+          name: userPayer.name,
+          email: userPayer.email,
+          cpf: userPayer.cpf,
         },
-      ],
-      payer: {
-        name: userPayer.name,
-        email: userPayer.email,
-        cpf: userPayer.cpf,
-      },
-      notification_url: `https://1ef2-2804-1be8-f135-24f0-e583-c35b-c626-cba6.ngrok-free.app/api/v1/payments/notifications`,
-      payment_methods: {
-        excluded_payment_methods: [
-          {
-            id: 'ticket',
-          },
-        ],
-        excluded_payment_types: [
-          {
-            id: 'ticket',
-          },
-        ],
-      },
-      metadata: data,
-    };
+        notification_url: `https://1c1d-2804-1be8-f135-24f0-c5d1-c2c2-5e18-4f3.ngrok-free.app/api/v1/payments/notifications`,
+        payment_methods: {
+          excluded_payment_methods: [
+            {
+              id: 'ticket',
+            },
+          ],
+          excluded_payment_types: [
+            {
+              id: 'ticket',
+            },
+          ],
+        },
+        metadata: data,
+      };
 
-    return mercadopago.preferences.create(preference as any);
+      const { body } = await mercadopago.preferences.create(preference as any);
+
+      const payment = this.paymentRepository.create({
+        ...data,
+        paymentLink: body.init_point,
+      });
+      return this.paymentRepository.save(payment);
+    } catch (err) {
+      throw Error(err);
+    }
   }
 
   async notification(data: any) {
