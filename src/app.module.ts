@@ -29,11 +29,11 @@ import { ResearchesModule } from './researches/researches.module';
     }),
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.mailgun.org',
+        host: '',
         port: 587,
         auth: {
-          user: 'postmaster@sandbox50ce930cd1da4e4baabf3c36a43a6be0.mailgun.org',
-          pass: 'a7d89e5f3f683b59e3681823cc8fa3fc-70c38fed-167bb8bb',
+          user: '',
+          pass: '',
         },
       },
     }),
