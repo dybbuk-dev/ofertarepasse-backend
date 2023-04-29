@@ -69,6 +69,10 @@ export class AdvertEntity {
 
   @Column({ default: 0 })
   views: number;
+
+  @Column({ default: 0 })
+  proposals: number;
+
   @Column({ default: true })
   active: boolean;
 

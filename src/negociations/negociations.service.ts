@@ -6,7 +6,7 @@ import { CreateNegociationDto } from './dto/create-negociation.dto';
 import { UpdateNegociationDto } from './dto/update-negociation.dto';
 import { NegociationEntity } from './entities/negociation.entity';
 // import { EmailsService } from 'src/emails/emails.service';
-// import { AdvertsService } from 'src/adverts/adverts.service';
+import { AdvertsService } from 'src/adverts/adverts.service';
 import { MercadoPago } from 'mercadopago/interface';
 const mercadopago: MercadoPago = require('mercadopago');
 
@@ -14,19 +14,25 @@ const mercadopago: MercadoPago = require('mercadopago');
 export class NegociationsService {
   constructor(
     @InjectRepository(NegociationEntity)
-    private readonly negociationsRepository: Repository<NegociationEntity>, // private readonly emailsServices: EmailsService, // private readonly advertServices: AdvertsService,
+    private readonly negociationsRepository: Repository<NegociationEntity>,
+    // private readonly emailsServices: EmailsService,
+    private readonly advertServices: AdvertsService,
   ) {}
 
   async create(data: CreateNegociationDto) {
     const negociation = this.negociationsRepository.create(data);
     const saveNegociation = await this.negociationsRepository.save(negociation);
 
-    // const advert = await this.advertServices.findOne({
-    //   where: {
-    //     id: data.advert,
-    //   },
-    //   relations: ['user'],
-    // });
+    const advert = await this.advertServices.findOne({
+      where: {
+        id: data.advert,
+      },
+      relations: ['user'],
+    });
+
+    await this.advertServices.update(data.advert as any, {
+      proposals: advert.proposals + 1,
+    });
 
     // await this.emailsServices.negociation(
     //   advert.user.email,
