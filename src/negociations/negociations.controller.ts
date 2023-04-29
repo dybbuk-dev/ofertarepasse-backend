@@ -6,21 +6,25 @@ import {
   Patch,
   Param,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { NegociationsService } from './negociations.service';
 import { CreateNegociationDto } from './dto/create-negociation.dto';
 import { UpdateNegociationDto } from './dto/update-negociation.dto';
 import { ParseUUIDPipe } from '@nestjs/common/pipes/parse-uuid.pipe';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('/api/v1/negociations')
 export class NegociationsController {
   constructor(private readonly negociationsService: NegociationsService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   create(@Body() createNegociationDto: CreateNegociationDto) {
     return this.negociationsService.create(createNegociationDto);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   findAll(
     @Query('userId') user: string,
@@ -38,11 +42,13 @@ export class NegociationsController {
     );
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.negociationsService.findOne({ where: { id } });
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
