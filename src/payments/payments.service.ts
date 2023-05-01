@@ -6,16 +6,11 @@ import { UsersService } from 'src/users/users.service';
 import { AdvertsService } from 'src/adverts/adverts.service';
 import { EmailsService } from 'src/emails/emails.service';
 import { NegociationsService } from './../negociations/negociations.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { PaymentEntity } from './entities/payment.entity';
-import { Repository } from 'typeorm';
 const mercadopago: MercadoPago = require('mercadopago');
 
 @Injectable()
 export class PaymentsService {
   constructor(
-    @InjectRepository(PaymentEntity)
-    private readonly paymentRepository: Repository<PaymentEntity>,
     private readonly userServices: UsersService,
     private readonly advertsService: AdvertsService,
     private readonly emailsServices: EmailsService,
@@ -51,7 +46,7 @@ export class PaymentsService {
           email: userPayer.email,
           cpf: userPayer.cpf,
         },
-        notification_url: `https://1c1d-2804-1be8-f135-24f0-c5d1-c2c2-5e18-4f3.ngrok-free.app/api/v1/payments/notifications`,
+        notification_url: `https://ca3c-2804-1be8-f135-24f0-30e0-22cc-d645-a047.ngrok-free.app/api/v1/payments/notifications`,
         payment_methods: {
           excluded_payment_methods: [
             {
@@ -67,13 +62,7 @@ export class PaymentsService {
         metadata: data,
       };
 
-      const { body } = await mercadopago.preferences.create(preference as any);
-
-      const payment = this.paymentRepository.create({
-        ...data,
-        paymentLink: body.init_point,
-      });
-      return this.paymentRepository.save(payment);
+      return mercadopago.preferences.create(preference as any);
     } catch (err) {
       throw Error(err);
     }
@@ -89,7 +78,9 @@ export class PaymentsService {
         });
 
         const negociation = await this.negociationsService.findOne({
-          where: { advert: advert.id },
+          where: {
+            id: payment.response.metadata.negociation,
+          },
         });
 
         // const userPayer = await this.userServices.findOne({

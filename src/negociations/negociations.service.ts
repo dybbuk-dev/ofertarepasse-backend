@@ -7,8 +7,6 @@ import { UpdateNegociationDto } from './dto/update-negociation.dto';
 import { NegociationEntity } from './entities/negociation.entity';
 // import { EmailsService } from 'src/emails/emails.service';
 import { AdvertsService } from 'src/adverts/adverts.service';
-import { MercadoPago } from 'mercadopago/interface';
-const mercadopago: MercadoPago = require('mercadopago');
 
 @Injectable()
 export class NegociationsService {
@@ -20,9 +18,6 @@ export class NegociationsService {
   ) {}
 
   async create(data: CreateNegociationDto) {
-    const negociation = this.negociationsRepository.create(data);
-    const saveNegociation = await this.negociationsRepository.save(negociation);
-
     const advert = await this.advertServices.findOne({
       where: {
         id: data.advert,
@@ -40,11 +35,18 @@ export class NegociationsService {
     //   `Uma negociação foi aberta para o seu anúncio: ${advert.title}`,
     // );
 
+    const negociation = this.negociationsRepository.create({
+      ...data,
+      value: advert.value,
+    });
+    const saveNegociation = await this.negociationsRepository.save(negociation);
+
     return saveNegociation;
   }
 
   async findAll(
     user: string,
+    intermediary: string,
     limit: number,
     status: string,
     page: number,
@@ -52,6 +54,7 @@ export class NegociationsService {
   ) {
     const [items, count] = await this.negociationsRepository.findAndCount({
       where: {
+        intermediary: intermediary ? intermediary : Not(''),
         advert: {
           title: search ? Like(`%${search}%`) : Not(''),
           user: user ? user : Not(''),
@@ -79,17 +82,5 @@ export class NegociationsService {
     this.negociationsRepository.merge(negociation, updateNegociationDto);
 
     return this.negociationsRepository.save(negociation);
-  }
-
-  async notification(data: any) {
-    if (data.type === 'payment' && data.data.id) {
-      try {
-        const payment = await mercadopago.payment.get(data.data.id);
-
-        console.log(payment);
-      } catch (err) {
-        throw Error(err.message);
-      }
-    }
   }
 }

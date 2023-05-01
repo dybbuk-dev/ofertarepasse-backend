@@ -28,6 +28,7 @@ export class NegociationsController {
   @Get()
   findAll(
     @Query('userId') user: string,
+    @Query('intermeriary') intermediary: string,
     @Query('limit') limit: string,
     @Query('page') page: string,
     @Query('status') status: string,
@@ -35,6 +36,7 @@ export class NegociationsController {
   ) {
     return this.negociationsService.findAll(
       user,
+      intermediary,
       +limit,
       status,
       +page,
@@ -55,10 +57,5 @@ export class NegociationsController {
     @Body() updateNegociationDto: UpdateNegociationDto,
   ) {
     return this.negociationsService.update(id, updateNegociationDto);
-  }
-
-  @Post('/nofification')
-  notification(@Body() data: any) {
-    return this.negociationsService.notification(data);
   }
 }

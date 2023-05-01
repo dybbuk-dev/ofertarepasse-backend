@@ -1,16 +1,18 @@
 import { IsNotEmpty } from 'class-validator';
-import { PaymentEntity } from '../entities/payment.entity';
 
 export class CreatePaymentDto {
   @IsNotEmpty()
-  receiver: PaymentEntity['receiver'];
+  receiver: string;
 
   @IsNotEmpty()
-  payer: PaymentEntity['payer'];
+  payer: string;
 
   @IsNotEmpty()
-  intermediary: PaymentEntity['intermediary'];
+  intermediary: string;
 
   @IsNotEmpty()
-  advert: PaymentEntity['advert'];
+  advert: string;
+
+  @IsNotEmpty()
+  negociation: string;
 }
