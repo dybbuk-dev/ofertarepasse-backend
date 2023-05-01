@@ -8,7 +8,7 @@ export class EmailsService {
   async negociation(email: string, title: string, text: string) {
     this.mailerService.sendMail({
       to: email,
-      from: 'nao-responder@bradypus.com.br',
+      from: 'nao-responder@ofertarepasse.com.br',
       subject: title,
       text: text,
     });

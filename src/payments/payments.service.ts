@@ -18,50 +18,54 @@ export class PaymentsService {
   ) {}
 
   async create(data: CreatePaymentDto) {
-    mercadopago.configure({
-      access_token: process.env.MERCADOPAGO_ACCESS_TOKEN_TESTE,
-    });
+    try {
+      mercadopago.configure({
+        access_token: process.env.MERCADOPAGO_ACCESS_TOKEN,
+      });
 
-    const advert = await this.advertsService.findOne({
-      where: { id: data.advert },
-    });
+      const advert = await this.advertsService.findOne({
+        where: { id: data.advert },
+      });
 
-    const userPayer = await this.userServices.findOne({
-      where: { id: data.userPayer },
-    });
+      const userPayer = await this.userServices.findOne({
+        where: { id: data.payer },
+      });
 
-    const preference = {
-      items: [
-        {
-          title: advert.title,
-          description: advert.about,
-          currency_id: 'BRL',
-          quantity: 1,
-          unit_price: advert.value,
+      const preference = {
+        items: [
+          {
+            title: advert.title,
+            description: advert.about,
+            currency_id: 'BRL',
+            quantity: 1,
+            unit_price: advert.value,
+          },
+        ],
+        payer: {
+          name: userPayer.name,
+          email: userPayer.email,
+          cpf: userPayer.cpf,
         },
-      ],
-      payer: {
-        name: userPayer.name,
-        email: userPayer.email,
-        cpf: userPayer.cpf,
-      },
-      notification_url: `https://1ef2-2804-1be8-f135-24f0-e583-c35b-c626-cba6.ngrok-free.app/api/v1/payments/notifications`,
-      payment_methods: {
-        excluded_payment_methods: [
-          {
-            id: 'ticket',
-          },
-        ],
-        excluded_payment_types: [
-          {
-            id: 'ticket',
-          },
-        ],
-      },
-      metadata: data,
-    };
+        notification_url: `https://ca3c-2804-1be8-f135-24f0-30e0-22cc-d645-a047.ngrok-free.app/api/v1/payments/notifications`,
+        payment_methods: {
+          excluded_payment_methods: [
+            {
+              id: 'ticket',
+            },
+          ],
+          excluded_payment_types: [
+            {
+              id: 'ticket',
+            },
+          ],
+        },
+        metadata: data,
+      };
 
-    return mercadopago.preferences.create(preference as any);
+      return mercadopago.preferences.create(preference as any);
+    } catch (err) {
+      throw Error(err);
+    }
   }
 
   async notification(data: any) {
@@ -74,7 +78,9 @@ export class PaymentsService {
         });
 
         const negociation = await this.negociationsService.findOne({
-          where: { advert: advert.id },
+          where: {
+            id: payment.response.metadata.negociation,
+          },
         });
 
         // const userPayer = await this.userServices.findOne({

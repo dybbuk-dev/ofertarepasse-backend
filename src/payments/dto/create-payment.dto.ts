@@ -2,14 +2,17 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreatePaymentDto {
   @IsNotEmpty()
-  userReceive: string;
+  receiver: string;
 
   @IsNotEmpty()
-  userPayer: string;
+  payer: string;
 
   @IsNotEmpty()
-  userIntermediary: string;
+  intermediary: string;
 
   @IsNotEmpty()
   advert: string;
+
+  @IsNotEmpty()
+  negociation: string;
 }

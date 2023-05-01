@@ -14,8 +14,4 @@ export class CreateNegociationDto {
   @ApiProperty()
   @IsNotEmpty()
   intermediary: NegociationEntity['user'];
-
-  @ApiProperty()
-  @IsNotEmpty()
-  value: NegociationEntity['value'];
 }
