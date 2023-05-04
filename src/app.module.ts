@@ -13,6 +13,7 @@ import { EmailsModule } from './emails/emails.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PaymentsModule } from './payments/payments.module';
 import { ResearchesModule } from './researches/researches.module';
+import { FipeModule } from './fipe/fipe.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ResearchesModule } from './researches/researches.module';
     EmailsModule,
     PaymentsModule,
     ResearchesModule,
+    FipeModule,
   ],
   controllers: [],
   providers: [],
