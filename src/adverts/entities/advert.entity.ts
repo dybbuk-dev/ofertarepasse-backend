@@ -58,10 +58,10 @@ export class AdvertEntity {
   @Column()
   value: number;
 
-  @Column({ nullable: true, default: null })
+  @Column({ nullable: true, default: null, type: 'longtext' })
   about: string;
 
-  @Column({ nullable: true, default: null })
+  @Column({ nullable: true, default: null, type: 'longtext' })
   alert: string;
 
   @ManyToOne(() => UserEntity, (user) => user.adverts)
