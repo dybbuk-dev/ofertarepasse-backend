@@ -23,6 +23,26 @@ export class FipeService {
         ),
     );
 
+    const { data: dataFipe } = await firstValueFrom(
+      this.httpService
+        .get<any>(
+          `http://api.fipeapi.com.br/v1/fipe/${data.data.fipes[0].codigo}?${process.env.WIPSITES_KEY_FIPE}`,
+        )
+        .pipe(
+          catchError(() => {
+            throw new BadRequestException(
+              'Não encontramos sua placa, verifique antes de enviar novamente.',
+            );
+          }),
+        ),
+    );
+
+    data.data.veiculo.marca = dataFipe[0].marca;
+    data.data.veiculo.modelo = dataFipe[0].modelo.split(' ')[0];
+    data.data.veiculo.versao = dataFipe[0].modelo
+      .replace(dataFipe[0].modelo.split(' ')[0], '')
+      .replace(' ', '');
+
     return data;
   }
 }
