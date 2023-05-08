@@ -3,6 +3,10 @@ import { UsersService } from 'src/users/users.service';
 import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginDto } from './dto/auth-login.dto';
+import { OAuth2Client } from 'google-auth-library';
+import { TypePerson } from 'src/users/enum/type.enum';
+import { Status } from 'src/users/enum/status.enum';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +22,7 @@ export class AuthService {
       if (!verifyUser) {
         return {
           error: true,
-          message: 'Email or password invalid',
+          message: 'Email ou senha inválido',
         };
       }
 
@@ -30,7 +34,7 @@ export class AuthService {
 
     return {
       error: true,
-      message: 'Email or password invalid',
+      message: 'Email ou senha inválido',
     };
   }
 
@@ -51,5 +55,46 @@ export class AuthService {
     });
 
     return user;
+  }
+
+  async google(credencial: string) {
+    const client = new OAuth2Client(process.env.GOOGLE_AUTH_AUDIENCE);
+
+    const ticket = await client.verifyIdToken({
+      idToken: credencial,
+      audience: process.env.GOOGLE_AUTH_AUDIENCE,
+    });
+
+    const payload = ticket.getPayload();
+
+    try {
+      const user = await this.usersService.findOne({
+        where: { email: payload.email },
+      });
+
+      return {
+        ...user,
+        token: this.jwtService.sign({ email: user.email, id: user.id }),
+      };
+    } catch (err) {
+      const user: any = await this.usersService.create({
+        email: payload.email,
+        name: payload.name,
+        password: randomUUID().split('-')[0],
+        type: TypePerson.prysical,
+        image: null,
+        status: Status.active,
+      });
+
+      return {
+        ...user,
+        token: this.jwtService.sign({ email: user.email, id: user.id }),
+      };
+    }
+
+    // return {
+    //   ...user,
+    //   token: this.jwtService.sign({ email: user.email, id: verifyUser.id })
+    // }
   }
 }

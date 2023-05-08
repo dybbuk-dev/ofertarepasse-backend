@@ -10,4 +10,9 @@ export class AuthController {
   async login(@Body() body: AuthLoginDto) {
     return this.authService.login(body);
   }
+
+  @Post('google')
+  async google(@Body('credencial') credencial: string) {
+    return this.authService.google(credencial);
+  }
 }

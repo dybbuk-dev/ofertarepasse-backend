@@ -8,7 +8,7 @@ export class FipeController {
   constructor(private readonly fipeService: FipeService) {}
 
   @Get()
-  create(@Query('plate') plate: string) {
+  plate(@Query('plate') plate: string) {
     return this.fipeService.fipe(plate);
   }
 }
