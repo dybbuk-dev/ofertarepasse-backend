@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
-import { compareSync } from 'bcrypt';
+import { compareSync, hashSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { TypePerson } from 'src/users/enum/type.enum';
@@ -116,6 +116,33 @@ export class AuthService {
       return this.createUserAfterSocial(data.email, data.name);
     } catch (err) {
       throw err;
+    }
+  }
+
+  async generateToken(email: string) {
+    return this.jwtService.sign(
+      { email },
+      { secret: process.env.JWT_SECRET_EMAIL, expiresIn: '10m' },
+    );
+  }
+
+  async changePassword(token: string, password: string) {
+    try {
+      await this.jwtService.verifyAsync(token, {
+        secret: process.env.JWT_SECRET_EMAIL,
+      });
+
+      const tokenDecode: any = this.jwtService.decode(token);
+
+      const user = await this.usersService.findOne({
+        where: { email: tokenDecode.email },
+      });
+
+      await this.usersService.update(user.id, {
+        password: hashSync(password, 10),
+      });
+    } catch (err) {
+      return Error('Token inválido');
     }
   }
 }

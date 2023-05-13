@@ -20,4 +20,17 @@ export class AuthController {
   async facebook(@Body('token') token: string) {
     return this.authService.facebook(token);
   }
+
+  @Post('tokenEmail')
+  async generateToken(@Body('email') email: string) {
+    return this.authService.generateToken(email);
+  }
+
+  @Post('changePassword')
+  async changePassword(
+    @Body('token') token: string,
+    @Body('password') password: string,
+  ) {
+    return this.authService.changePassword(token, password);
+  }
 }
