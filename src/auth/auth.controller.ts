@@ -12,7 +12,12 @@ export class AuthController {
   }
 
   @Post('google')
-  async google(@Body('credencial') credencial: string) {
-    return this.authService.google(credencial);
+  async google(@Body('token') token: string) {
+    return this.authService.google(token);
+  }
+
+  @Post('facebook')
+  async facebook(@Body('token') token: string) {
+    return this.authService.facebook(token);
   }
 }

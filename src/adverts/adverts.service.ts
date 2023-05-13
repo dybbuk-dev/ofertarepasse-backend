@@ -53,7 +53,7 @@ export class AdvertsService {
       try {
         const keys: Array<string> = await this.s3Services.uploadFiles(files);
 
-        await this.update(id, { images: keys });
+        await this.update(id, { images: [...advert.images, ...keys] });
       } catch (err) {
         throw new HttpException(err.message, 500);
       }
@@ -62,9 +62,25 @@ export class AdvertsService {
     }
   }
 
-  async deleteFiles(files: string[]) {
+  async deleteFiles(id: string, files: string[]) {
     try {
-      return await this.s3Services.deleteFiles(files);
+      const advert = await this.findOne({ where: { id } });
+
+      if (advert) {
+        await this.s3Services.deleteFiles(files);
+
+        const newArray = [];
+
+        for (const item of advert.images) {
+          if (!files.includes(item)) {
+            newArray.push(item);
+          }
+        }
+
+        return this.update(id, { images: newArray });
+      } else {
+        throw new HttpException('Error on get advert', 404);
+      }
     } catch (err) {
       throw new HttpException(err.message, 500);
     }

@@ -101,7 +101,7 @@ export class S3Service {
           throw new Error('Erro deleting images');
         }
       } catch (err) {
-        throw err;
+        throw Error(err);
       }
     }
   }

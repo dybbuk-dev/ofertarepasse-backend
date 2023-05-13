@@ -3,10 +3,10 @@ import { UsersService } from 'src/users/users.service';
 import { compareSync } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { AuthLoginDto } from './dto/auth-login.dto';
-import { OAuth2Client } from 'google-auth-library';
 import { TypePerson } from 'src/users/enum/type.enum';
 import { Status } from 'src/users/enum/status.enum';
 import { randomUUID } from 'crypto';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -57,19 +57,10 @@ export class AuthService {
     return user;
   }
 
-  async google(credencial: string) {
-    const client = new OAuth2Client(process.env.GOOGLE_AUTH_AUDIENCE);
-
-    const ticket = await client.verifyIdToken({
-      idToken: credencial,
-      audience: process.env.GOOGLE_AUTH_AUDIENCE,
-    });
-
-    const payload = ticket.getPayload();
-
+  async createUserAfterSocial(email: string, name: string) {
     try {
       const user = await this.usersService.findOne({
-        where: { email: payload.email },
+        where: { email },
       });
 
       return {
@@ -78,8 +69,8 @@ export class AuthService {
       };
     } catch (err) {
       const user: any = await this.usersService.create({
-        email: payload.email,
-        name: payload.name,
+        email,
+        name,
         password: randomUUID().split('-')[0],
         type: TypePerson.prysical,
         image: null,
@@ -91,10 +82,40 @@ export class AuthService {
         token: this.jwtService.sign({ email: user.email, id: user.id }),
       };
     }
+  }
 
-    // return {
-    //   ...user,
-    //   token: this.jwtService.sign({ email: user.email, id: verifyUser.id })
-    // }
+  async google(token: string) {
+    try {
+      await axios.get(
+        `https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=${token}`,
+      );
+
+      const { data } = await axios.get(
+        `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${token}`,
+      );
+
+      return this.createUserAfterSocial(data.email, data.name);
+    } catch (err) {
+      throw err; // or handle the error as you wish
+    }
+  }
+
+  async facebook(token: string) {
+    try {
+      const { data: dataVerify } = await axios.get(
+        `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${process.env.FACEBOOK_APP_ID}|${process.env.FACEBOOK_APP_SECRET}`,
+      );
+      if (dataVerify.data.error) {
+        throw dataVerify.data.error.message;
+      }
+
+      const { data } = await axios.get(
+        `https://graph.facebook.com/me?fields=name,email&access_token=${token}`,
+      );
+
+      return this.createUserAfterSocial(data.email, data.name);
+    } catch (err) {
+      throw err;
+    }
   }
 }

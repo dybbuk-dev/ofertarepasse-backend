@@ -40,9 +40,12 @@ export class AdvertsController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/delete-file')
-  async deleteImage(@Body('files') files: Array<string>) {
-    return this.advertsService.deleteFiles(files);
+  @Post(':id/delete-file')
+  async deleteImage(
+    @Body('files') files: Array<string>,
+    @Param('id', new ParseUUIDPipe()) id: string,
+  ) {
+    return this.advertsService.deleteFiles(id, files);
   }
 
   @Get()
