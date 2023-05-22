@@ -14,6 +14,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { PaymentsModule } from './payments/payments.module';
 import { ResearchesModule } from './researches/researches.module';
 import { FipeModule } from './fipe/fipe.module';
+import { AdvertisersModule } from './advertisers/advertisers.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { FipeModule } from './fipe/fipe.module';
     PaymentsModule,
     ResearchesModule,
     FipeModule,
+    AdvertisersModule,
   ],
   controllers: [],
   providers: [],

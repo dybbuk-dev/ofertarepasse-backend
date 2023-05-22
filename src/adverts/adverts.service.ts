@@ -51,9 +51,14 @@ export class AdvertsService {
 
     if (advert) {
       try {
+        let images = [];
+        if (advert.images) {
+          images = [...advert.images];
+        }
+
         const keys: Array<string> = await this.s3Services.uploadFiles(files);
 
-        await this.update(id, { images: [...advert.images, ...keys] });
+        await this.update(id, { images: [...images, ...keys] });
       } catch (err) {
         throw new HttpException(err.message, 500);
       }

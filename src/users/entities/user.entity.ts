@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Status } from '../enum/status.enum';
 import { Roles } from '../enum/roles.enum';
@@ -69,13 +70,22 @@ export class UserEntity {
   @UpdateDateColumn()
   updated_at: string;
 
-  @OneToMany(() => FavoriteEntity, (favorite) => favorite.user)
+  @DeleteDateColumn()
+  deleted_at: string;
+
+  @OneToMany(() => FavoriteEntity, (favorite) => favorite.user, {
+    cascade: true,
+  })
   favorites: FavoriteEntity[];
 
-  @OneToMany(() => NegociationEntity, (negociations) => negociations.user)
+  @OneToMany(() => NegociationEntity, (negociations) => negociations.user, {
+    cascade: true,
+  })
   negociations: NegociationEntity[];
 
-  @OneToMany(() => AdvertEntity, (advert) => advert.user)
+  @OneToMany(() => AdvertEntity, (advert) => advert.user, {
+    cascade: true,
+  })
   adverts: AdvertEntity[];
 
   @BeforeInsert()
