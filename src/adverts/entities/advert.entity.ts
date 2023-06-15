@@ -50,10 +50,16 @@ export class AdvertEntity {
   version: string;
 
   @Column()
+  vehicleType: string;
+
+  @Column()
   color: string;
 
   @Column({ default: 0 })
   kilometer: number;
+
+  @Column()
+  exchange: string;
 
   @Column()
   value: number;
@@ -80,13 +86,22 @@ export class AdvertEntity {
   city: string;
 
   @Column()
+  bodywork: string;
+
+  @Column()
   state: string;
+
+  @Column('simple-array', { nullable: true, default: null })
+  options: string[];
 
   @Column('simple-array', { nullable: true, default: null })
   highlight: string[];
 
   @Column({ name: 'fipe_value' })
   fipeValue: number;
+
+  @Column()
+  armored: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

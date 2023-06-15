@@ -24,6 +24,13 @@ interface IOptionsFindAll extends IPaginationOptions {
     exchange: string;
     armored: string;
     bodywork: string;
+    vehicleType: string;
+    options: string;
+    fuel: string;
+    finalPlate: string;
+    colors: string;
+    highlight: string;
+    withPhoto: string;
   };
 }
 
@@ -94,43 +101,83 @@ export class AdvertsService {
   async findAll(options: IOptionsFindAll): Promise<any> {
     const queries = options.query;
 
-    const whereOptions = {
-      user: { id: queries.userId ? queries.userId : Not('') },
-      title: queries.title ? Like(`%${queries.title}%`) : Not(''),
-      value:
-        queries.minPrice || queries.maxPrice
-          ? Between(
-              queries.minPrice ? queries.minPrice : 0,
-              queries.maxPrice ? queries.maxPrice : 100000,
-            )
-          : Not(''),
-      brand: queries.brand ? Like(`%${queries.brand}%`) : Not(''),
-      city: queries.city ? Like(`%${queries.city}%`) : Not(''),
-      modelYear:
-        queries.minYear || queries.maxYear
-          ? Between(
-              queries.minYear ? queries.minYear : 1980,
-              queries.maxYear ? queries.maxYear : 2023,
-            )
-          : Not(''),
-      kilometer:
-        queries.minKilometer || queries.maxKilometer
-          ? Between(
-              queries.minKilometer ? queries.minKilometer : 0,
-              queries.maxKilometer ? queries.maxKilometer : 150000,
-            )
-          : Not(''),
+    const whereOptions: any = {
       active: true,
     };
+    if (queries.userId) {
+      whereOptions.user = Like(`%${queries.userId}%`);
+    }
+    if (queries.title) {
+      whereOptions.title = Like(`%${queries.title}%`);
+    }
+    if (queries.minPrice || queries.maxPrice) {
+      whereOptions.value = Between(
+        queries.minPrice ? queries.minPrice : 0,
+        queries.maxPrice ? queries.maxPrice : 100000,
+      );
+    }
+    if (queries.brand) {
+      whereOptions.brand = Like(`%${queries.brand}%`);
+    }
+    if (queries.city) {
+      whereOptions.city = Like(`%${queries.city}%`);
+    }
+    if (queries.minYear || queries.maxYear) {
+      whereOptions.modelYear = Between(
+        queries.minYear ? queries.minYear : 1980,
+        queries.maxYear ? queries.maxYear : 2023,
+      );
+    }
+    if (queries.minKilometer || queries.maxKilometer) {
+      whereOptions.kilometer = Between(
+        queries.minKilometer ? queries.minKilometer : 0,
+        queries.maxKilometer ? queries.maxKilometer : 150000,
+      );
+    }
+    if (queries.vehicleType) {
+      whereOptions.vehicleType = Like(`%${queries.vehicleType}%`);
+    }
+    if (queries.exchange) {
+      whereOptions.exchange = Like(`%${queries.exchange}%`);
+    }
+    if (queries.armored) {
+      whereOptions.armored = Like(`%${queries.armored}%`);
+    }
+    if (queries.bodywork) {
+      whereOptions.bodywork = Like(`%${queries.bodywork}%`);
+    }
+    if (queries.fuel) {
+      whereOptions.fuel = Like(`%${queries.fuel}%`);
+    }
+    if (queries.colors) {
+      whereOptions.color = Like(`%${queries.colors}%`);
+    }
+    if (queries.withPhoto === 'true') {
+      whereOptions.images = Not('');
+    }
+
+    let whereOption;
+
+    if (queries.finalPlate) {
+      whereOption = queries.finalPlate.split(' e ').map((st) => {
+        return { ...whereOptions, plate: Like(`%${st}`) };
+      });
+    } else {
+      whereOption = whereOptions;
+    }
 
     const [items, count] = await this.advertsRepository.findAndCount({
-      where: whereOptions,
+      where: whereOption,
       skip: +options.page > 1 ? +options.limit * (+options.page - 1) : 0,
       take: +options.limit || 20,
     });
 
     return {
-      items,
+      items: items.filter(
+        ({ options, highlight }) =>
+          (queries.options ? options?.includes(queries.options) : true) &&
+          (queries.highlight ? highlight?.includes(queries.highlight) : true),
+      ),
       count,
     };
   }
