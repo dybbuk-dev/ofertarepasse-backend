@@ -4,7 +4,21 @@ import { ValidationPipe } from '@nestjs/common';
 // import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 // import * as fs from 'fs';
+import { IoAdapter } from '@nestjs/platform-socket.io';
+import { ServerOptions } from 'socket.io';
 
+class SocketAdapter extends IoAdapter {
+  createIOServer(
+    port: number,
+    options?: ServerOptions & {
+      namespace?: string;
+      server?: any;
+    },
+  ) {
+    const server = super.createIOServer(port, { ...options, cors: true });
+    return server;
+  }
+}
 async function bootstrap() {
   // const httpsOptions = {
   //   key: fs.readFileSync(
@@ -23,6 +37,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(
     AppModule,
+    // { cors: true },
     // { httpsOptions }
   );
 
@@ -45,7 +60,7 @@ async function bootstrap() {
       },
     }),
   );
-
+  app.useWebSocketAdapter(new SocketAdapter(app));
   await app.listen(process.env.PORT);
 }
 bootstrap();

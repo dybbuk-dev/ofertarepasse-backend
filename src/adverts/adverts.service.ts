@@ -12,6 +12,7 @@ import { ResearchesService } from 'src/researches/researches.service';
 interface IOptionsFindAll extends IPaginationOptions {
   query: {
     userId: string;
+    seller: string;
     title: string;
     brand: string;
     city: string;
@@ -155,6 +156,7 @@ export class AdvertsService {
     if (queries.withPhoto === 'true') {
       whereOptions.images = Not('');
     }
+    if (queries.seller) whereOptions.user = { type: queries.seller };
 
     let whereOption;
 
@@ -170,6 +172,7 @@ export class AdvertsService {
       where: whereOption,
       skip: +options.page > 1 ? +options.limit * (+options.page - 1) : 0,
       take: +options.limit || 20,
+      relations: ['user'],
     });
 
     return {

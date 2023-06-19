@@ -17,6 +17,7 @@ import { TypePerson } from '../enum/type.enum';
 import { hashSync } from 'bcrypt';
 import { NegociationEntity } from 'src/negociations/entities/negociation.entity';
 import { AdvertEntity } from 'src/adverts/entities/advert.entity';
+import { ChatEntity } from 'src/chat/entities/chat.entity';
 
 @Entity('users')
 @Unique(['email'])
@@ -64,6 +65,9 @@ export class UserEntity {
   @Column({ type: 'timestamp', nullable: true, default: null })
   dateOfBirth: Date;
 
+  @Column()
+  isOnline: Boolean;
+
   @CreateDateColumn()
   created_at: string;
 
@@ -87,6 +91,16 @@ export class UserEntity {
     cascade: true,
   })
   adverts: AdvertEntity[];
+
+  @OneToMany(() => ChatEntity, (chat) => chat.sender, {
+    cascade: true,
+  })
+  messagesSent: ChatEntity[];
+
+  @OneToMany(() => ChatEntity, (chat) => chat.recipient, {
+    cascade: true,
+  })
+  messagesReceived: ChatEntity[];
 
   @BeforeInsert()
   hasPassword() {

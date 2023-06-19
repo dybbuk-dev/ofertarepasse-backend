@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { AdvertsModule } from './adverts/adverts.module';
+import { ChatModule } from './chat/chat.module';
 import { FavoritesModule } from './favorites/favorites.module';
 import { S3Module } from './s3/s3.module';
 import { NegociationsModule } from './negociations/negociations.module';
@@ -42,6 +43,7 @@ import { AdvertisersModule } from './advertisers/advertisers.module';
     UsersModule,
     AuthModule,
     AdvertsModule,
+    ChatModule,
     FavoritesModule,
     S3Module,
     NegociationsModule,

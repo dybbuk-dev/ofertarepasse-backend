@@ -69,4 +69,10 @@ export class UsersService {
     await this.usersRepository.findOneOrFail({ where: { id } });
     this.usersRepository.delete({ id });
   }
+
+  async setOnlineStatus(id: string, status: boolean) {
+    this.usersRepository.update(id, {
+      isOnline: status,
+    });
+  }
 }
