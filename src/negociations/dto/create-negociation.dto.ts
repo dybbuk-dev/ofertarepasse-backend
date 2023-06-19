@@ -11,7 +11,7 @@ export class CreateNegociationDto {
   @IsNotEmpty()
   advert: NegociationEntity['advert'];
 
-  @ApiProperty()
-  @IsNotEmpty()
-  intermediary: NegociationEntity['user'];
+  // @ApiProperty()
+  // @IsNotEmpty()
+  // intermediary: NegociationEntity['user'];
 }

@@ -16,6 +16,7 @@ import { PaymentsModule } from './payments/payments.module';
 import { ResearchesModule } from './researches/researches.module';
 import { FipeModule } from './fipe/fipe.module';
 import { AdvertisersModule } from './advertisers/advertisers.module';
+import { FeeModule } from './fee/fee.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AdvertisersModule } from './advertisers/advertisers.module';
     S3Module,
     NegociationsModule,
     EmailsModule,
+    FeeModule,
     PaymentsModule,
     ResearchesModule,
     FipeModule,
