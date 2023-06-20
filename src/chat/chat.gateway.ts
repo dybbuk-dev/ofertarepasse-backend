@@ -16,7 +16,7 @@ import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
 
-@WebSocketGateway(2082, { cors: true, transports: ['websocket', 'polling'] })
+@WebSocketGateway(3002, { cors: true, transports: ['websocket', 'polling'] })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -26,6 +26,7 @@ export class ChatGateway
     private readonly userService: UsersService,
   ) {}
   private connectedClients = new Map<string, string>();
+  private timer;
 
   @WebSocketServer()
   server: Server;
@@ -106,7 +107,8 @@ export class ChatGateway
       this.userService.setOnlineStatus(user.id, true);
       this.server.emit('online-status', { id: user.id, isOnline: true });
 
-      setTimeout(() => {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
         this.userService.setOnlineStatus(user.id, false);
         this.server.emit('online-status', { id: user.id, isOnline: false });
       }, 60000);

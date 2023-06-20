@@ -22,7 +22,7 @@ export class ChatEntity {
   @Column()
   message: string;
 
-  @Column()
+  @Column({ default: false })
   isRead: boolean;
 
   @CreateDateColumn({ name: 'created_at' })
