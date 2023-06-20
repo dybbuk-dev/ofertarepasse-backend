@@ -137,7 +137,7 @@ export class AdvertsService {
       );
     }
     if (queries.vehicleType) {
-      whereOptions.vehicleType = Like(`%${queries.vehicleType}%`);
+      whereOptions.vehicleType = In(queries.vehicleType.split(','));
     }
     if (queries.exchange) {
       whereOptions.exchange = In(queries.exchange.split(','));
@@ -260,5 +260,25 @@ export class AdvertsService {
     } else {
       return new HttpException('Advert not found', 404);
     }
+  }
+
+  async getFilterValues() {
+    const [items, count] = await this.advertsRepository.findAndCount({
+      where: {
+        color: Not(''),
+      },
+    });
+    const colorFilters: any = {};
+    for (const item of items) {
+      colorFilters[item.color] = 1;
+    }
+    return {
+      filters: {
+        colors: Object.keys(colorFilters).map((item) => ({
+          title: item,
+          value: item,
+        })),
+      },
+    };
   }
 }

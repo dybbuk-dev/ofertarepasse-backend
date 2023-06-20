@@ -16,7 +16,7 @@ import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
 
-@WebSocketGateway({ cors: true, transports: ['websocket', 'polling'] })
+@WebSocketGateway(2082, { cors: true, transports: ['websocket', 'polling'] })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {

@@ -53,6 +53,11 @@ export class AdvertsController {
     return this.advertsService.findAll({ page, limit, query });
   }
 
+  @Get('/getFilterValues')
+  filterValues() {
+    return this.advertsService.getFilterValues();
+  }
+
   @Get(':id')
   findOne(@Param('id', new ParseUUIDPipe()) id: AdvertEntity['id']) {
     return this.advertsService.findOne({ where: { id } });
