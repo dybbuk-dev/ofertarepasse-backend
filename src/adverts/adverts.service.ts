@@ -1,5 +1,5 @@
 import { AdvertEntity } from './entities/advert.entity';
-import { Like, Between, Repository, Not, FindOneOptions } from 'typeorm';
+import { Like, Between, Repository, Not, FindOneOptions, In } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { CreateAdvertDto } from './dto/create-advert.dto';
 import { UpdateAdvertDto } from './dto/update-advert.dto';
@@ -19,6 +19,7 @@ interface IOptionsFindAll extends IPaginationOptions {
     minYear: string;
     maxYear: string;
     minPrice: string;
+    location: string;
     maxPrice: string;
     minKilometer: string;
     maxKilometer: string;
@@ -139,30 +140,34 @@ export class AdvertsService {
       whereOptions.vehicleType = Like(`%${queries.vehicleType}%`);
     }
     if (queries.exchange) {
-      whereOptions.exchange = Like(`%${queries.exchange}%`);
+      whereOptions.exchange = In(queries.exchange.split(','));
     }
     if (queries.armored) {
       whereOptions.armored = Like(`%${queries.armored}%`);
     }
     if (queries.bodywork) {
-      whereOptions.bodywork = Like(`%${queries.bodywork}%`);
+      whereOptions.bodywork = In(queries.bodywork.split(','));
     }
     if (queries.fuel) {
-      whereOptions.fuel = Like(`%${queries.fuel}%`);
+      whereOptions.fuel = In(queries.fuel.split(','));
     }
     if (queries.colors) {
-      whereOptions.color = Like(`%${queries.colors}%`);
+      whereOptions.color = In(queries.colors.split(','));
     }
     if (queries.withPhoto === 'true') {
       whereOptions.images = Not('');
     }
-    if (queries.seller) whereOptions.user = { type: queries.seller };
+    if (queries.location) {
+      whereOptions.city = Like(`%${queries.location.split('/')[0]}%`);
+    }
+    if (queries.seller)
+      whereOptions.user = { type: In(queries.seller.split(',')) };
 
     let whereOption;
 
     if (queries.finalPlate) {
-      whereOption = queries.finalPlate.split(' e ').map((st) => {
-        return { ...whereOptions, plate: Like(`%${st}`) };
+      whereOption = queries.finalPlate.split(' e ').map((num) => {
+        return { ...whereOptions, plate: Like(`%${num}`) };
       });
     } else {
       whereOption = whereOptions;
@@ -178,8 +183,12 @@ export class AdvertsService {
     return {
       items: items.filter(
         ({ options, highlight }) =>
-          (queries.options ? options?.includes(queries.options) : true) &&
-          (queries.highlight ? highlight?.includes(queries.highlight) : true),
+          (queries.options
+            ? options?.some((item) => queries.options.includes(item))
+            : true) &&
+          (queries.highlight
+            ? highlight?.some((item) => queries.highlight.includes(item))
+            : true),
       ),
       count,
     };
