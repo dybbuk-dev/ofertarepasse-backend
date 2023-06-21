@@ -82,16 +82,18 @@ export class ChatService {
       }
     }
     return {
-      items: Object.values(payload).sort(
-        (a: any, b: any) =>
-          new Date(b.lastMsgTime).getTime() - new Date(a.lastMsgTime).getTime(),
-      ),
+      items:
+        Object.values(payload)?.sort(
+          (a: any, b: any) =>
+            new Date(b.lastMsgTime).getTime() -
+            new Date(a.lastMsgTime).getTime(),
+        ) ?? [],
     };
   }
 
   async readAll(userId: string, recId: string) {
     try {
-      await this.chatRepository.update(
+      const updatedResults = await this.chatRepository.update(
         {
           sender: {
             id: recId,
@@ -99,13 +101,36 @@ export class ChatService {
           recipient: {
             id: userId,
           },
+          isRead: false,
         },
         {
           isRead: true,
         },
       );
+      return {
+        affectedRecords: updatedResults.affected,
+      };
     } catch (err) {
       console.log('error', err);
+      throw err;
+    }
+  }
+
+  async getNewMessageCount(userId: string) {
+    try {
+      const count = await this.chatRepository.count({
+        where: {
+          recipient: {
+            id: userId,
+          },
+          isRead: false,
+        },
+      });
+      return {
+        newMessageCount: count,
+      };
+    } catch (err) {
+      console.log('get new message count error', err);
       throw err;
     }
   }

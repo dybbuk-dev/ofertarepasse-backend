@@ -26,7 +26,7 @@ export class ChatGateway
     private readonly userService: UsersService,
   ) {}
   private connectedClients = new Map<string, string>();
-  private timer;
+  private timer = new Map<string, any>();
 
   @WebSocketServer()
   server: Server;
@@ -97,21 +97,26 @@ export class ChatGateway
         senderId: chat.sender.id,
         recipientId: chat.recipient.id,
       };
-      const recipientSocketId = this.connectedClients.get(recipientId);
+      const recipientSocketId = this.connectedClients.get(
+        init ? process.env.ROOT_USER : recipientId,
+      );
 
       if (recipientSocketId) {
         this.server.to(recipientSocketId).emit('message', payload);
       }
       client.emit('message', payload);
 
+      //*********Set Online Status**************
       this.userService.setOnlineStatus(user.id, true);
       this.server.emit('online-status', { id: user.id, isOnline: true });
 
-      clearTimeout(this.timer);
-      this.timer = setTimeout(() => {
+      // set online status using debounce
+      clearTimeout(this.timer.get(user.id));
+      const newTimer = setTimeout(() => {
         this.userService.setOnlineStatus(user.id, false);
         this.server.emit('online-status', { id: user.id, isOnline: false });
       }, 60000);
+      this.timer.set(user.id, newTimer);
     } catch (err) {
       console.log('error', err);
       throw err;
@@ -123,5 +128,18 @@ export class ChatGateway
   handleChat(@ConnectedSocket() client: Socket) {
     const user = client['user'];
     this.connectedClients.set(user.id, client.id);
+  }
+
+  @UseGuards(WsAuthGuard)
+  @SubscribeMessage('read-all')
+  handleReadAll(
+    @ConnectedSocket() client: Socket,
+    @MessageBody()
+    { recipientId }: { recipientId: string },
+  ) {
+    const user = client['user'];
+    this.server
+      .to(this.connectedClients.get(recipientId))
+      .emit('read-all', { userWhoRead: user.id });
   }
 }

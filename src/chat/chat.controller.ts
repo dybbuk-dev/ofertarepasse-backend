@@ -5,6 +5,7 @@ import {
   UseGuards,
   Param,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -12,6 +13,12 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('/api/v1/chat')
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('/getNewMessageCount')
+  getNewMessageCount(@Query('userId') userId) {
+    return this.chatService.getNewMessageCount(userId);
+  }
 
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
